@@ -1,0 +1,46 @@
+# Python
+__pycache__/
+*.py[cod]
+*.so
+.Python
+venv/
+env/
+.env
+*.log
+db.sqlite3
+db.sqlite3-journal
+.pytest_cache/
+.coverage
+htmlcov/
+.mypy_cache/
+
+# Django
+staticfiles/
+media/
+*.pot
+
+# Node / Frontend
+node_modules/
+.next/
+out/
+build/
+dist/
+.npm
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Secrets & Environment
+.env
+.env.local
+.env.production
+*.pem
+*.key
+*CLAUDE.md
