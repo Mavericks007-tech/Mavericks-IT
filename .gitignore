@@ -44,3 +44,7 @@ Thumbs.db
 *.pem
 *.key
 *CLAUDE.md
+
+# Editor crash residue
+*.save
+
