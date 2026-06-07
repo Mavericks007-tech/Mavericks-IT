@@ -114,12 +114,36 @@ class FooterLink(BaseModel):
 
 
 class MediaAsset(BaseModel):
-    """Image/file library reusable across content."""
+    """Image / video / file library. Admin uploads + replaces freely.
+    Bytes live on disk under MEDIA_ROOT; DB stores path + metadata.
+    No artificial size cap — only disk space limits."""
+
+    MEDIA_TYPE_CHOICES = [
+        ('image', 'Image'),
+        ('video', 'Video'),
+        ('document', 'Document'),
+        ('audio', 'Audio'),
+        ('other', 'Other'),
+    ]
+
     title = models.CharField(max_length=200)
-    file = models.FileField(upload_to='media/')
-    alt_text = models.CharField(max_length=300, blank=True)
+    file = models.FileField(
+        upload_to='media/%Y/%m/',
+        help_text="Images, videos (mp4/webm), documents — no size limit. "
+                  "Replace anytime by uploading a new file here.",
+    )
+    media_type = models.CharField(max_length=20, choices=MEDIA_TYPE_CHOICES, default='image')
+    alt_text = models.CharField(max_length=300, blank=True,
+                                help_text="Required for images (SEO + accessibility)")
     caption = models.CharField(max_length=300, blank=True)
     tags = models.JSONField(default=list, blank=True)
+
+    # Auto-populated metadata
+    file_size = models.BigIntegerField(default=0, help_text="Bytes")
+    width = models.IntegerField(null=True, blank=True, help_text="Pixels (images/videos)")
+    height = models.IntegerField(null=True, blank=True)
+    mime_type = models.CharField(max_length=100, blank=True)
+
     history = HistoricalRecords()
 
     class Meta:
@@ -128,6 +152,39 @@ class MediaAsset(BaseModel):
 
     def __str__(self):
         return self.title
+
+    def save(self, *args, **kwargs):
+        if self.file and hasattr(self.file, 'file'):
+            try:
+                self.file_size = self.file.size
+            except Exception:
+                pass
+            # Auto-detect media_type from extension
+            name = self.file.name.lower()
+            if name.endswith(('.jpg', '.jpeg', '.png', '.gif', '.webp', '.svg', '.avif')):
+                self.media_type = 'image'
+            elif name.endswith(('.mp4', '.webm', '.mov', '.avi', '.mkv')):
+                self.media_type = 'video'
+            elif name.endswith(('.mp3', '.wav', '.ogg', '.m4a')):
+                self.media_type = 'audio'
+            elif name.endswith(('.pdf', '.doc', '.docx', '.xls', '.xlsx', '.ppt', '.pptx')):
+                self.media_type = 'document'
+            # Auto-detect mime
+            import mimetypes
+            guessed, _ = mimetypes.guess_type(name)
+            if guessed:
+                self.mime_type = guessed
+        super().save(*args, **kwargs)
+
+    @property
+    def size_display(self):
+        """Human-readable size."""
+        size = self.file_size or 0
+        for unit in ['B', 'KB', 'MB', 'GB']:
+            if size < 1024:
+                return f"{size:.1f} {unit}"
+            size /= 1024
+        return f"{size:.1f} TB"
 
 
 class Page(BaseModel):

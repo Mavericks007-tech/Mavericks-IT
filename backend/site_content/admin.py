@@ -73,9 +73,44 @@ class FooterLinkAdmin(SimpleHistoryAdmin):
 
 @admin.register(MediaAsset)
 class MediaAssetAdmin(SimpleHistoryAdmin):
-    list_display = ('title', 'file', 'alt_text', 'created_at')
+    list_display = ('title', 'media_type', 'preview', 'size_display', 'mime_type', 'updated_at')
+    list_filter = ('media_type',)
     search_fields = ('title', 'alt_text', 'caption')
-    readonly_fields = ('created_at', 'updated_at')
+    readonly_fields = ('file_size', 'width', 'height', 'mime_type', 'preview_large', 'created_at', 'updated_at')
+    fieldsets = (
+        ('File', {
+            'fields': ('title', 'file', 'media_type', 'preview_large'),
+            'description': 'Upload images, videos, or documents. To replace, upload a new file and save.',
+        }),
+        ('Metadata', {'fields': ('alt_text', 'caption', 'tags')}),
+        ('Auto-detected', {'fields': ('file_size', 'width', 'height', 'mime_type'), 'classes': ('collapse',)}),
+        ('Timestamps', {'fields': ('created_at', 'updated_at'), 'classes': ('collapse',)}),
+    )
+
+    @admin.display(description='Preview')
+    def preview(self, obj):
+        from django.utils.html import format_html
+        if not obj.file:
+            return '—'
+        if obj.media_type == 'image':
+            return format_html('<img src="{}" style="max-height:40px;border-radius:4px;" />', obj.file.url)
+        if obj.media_type == 'video':
+            return format_html('🎥 {}', obj.file.name.rsplit('/', 1)[-1])
+        return format_html('📄 {}', obj.file.name.rsplit('/', 1)[-1])
+
+    @admin.display(description='Preview')
+    def preview_large(self, obj):
+        from django.utils.html import format_html
+        if not obj.file:
+            return '—'
+        if obj.media_type == 'image':
+            return format_html('<img src="{}" style="max-width:400px;border-radius:8px;" />', obj.file.url)
+        if obj.media_type == 'video':
+            return format_html(
+                '<video controls style="max-width:400px;border-radius:8px;"><source src="{}" type="{}"></video>',
+                obj.file.url, obj.mime_type or 'video/mp4',
+            )
+        return format_html('<a href="{}" target="_blank">Open file →</a>', obj.file.url)
 
 
 @admin.register(Page)
