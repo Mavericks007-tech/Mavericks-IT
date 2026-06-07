@@ -1,0 +1,75 @@
+from django.http import JsonResponse
+from .models import Service, Testimonial, TrustStat, Industry, Differentiator, HeroSection
+
+def homepage_data(request):
+    try:
+        hero = HeroSection.objects.filter(is_active=True).first()
+        services = Service.objects.filter(is_featured=True).order_by('order')
+        trust_stats = TrustStat.objects.filter(is_active=True).order_by('order')
+        testimonials = Testimonial.objects.filter(is_featured=True).order_by('order')[:4]
+        
+        data = {
+            'hero': {
+                'headline': hero.headline if hero else "Bangladesh's Most Trusted Technology Partner",
+                'subheadline': hero.subheadline if hero else "We design, develop, and deploy world-class software",
+                'primary_cta_text': hero.primary_cta_text if hero else "Get a Free Consultation",
+                'primary_cta_link': hero.primary_cta_link if hero else "/contact",
+                'secondary_cta_text': hero.secondary_cta_text if hero else "View Our Work",
+                'secondary_cta_link': hero.secondary_cta_link if hero else "/portfolio",
+            } if hero else None,
+            'services': [
+                {
+                    'id': str(s.id),
+                    'title': s.title,
+                    'subtitle': s.subtitle,
+                    'simple_explanation': s.simple_explanation,
+                    'icon_name': s.icon_name,
+                    'order': s.order,
+                }
+                for s in services
+            ],
+            'trust_stats': [
+                {
+                    'id': str(stat.id),
+                    'label': stat.label,
+                    'value': stat.value,
+                    'numeric_value': stat.numeric_value,
+                    'suffix': stat.suffix,
+                }
+                for stat in trust_stats
+            ],
+            'testimonials': [
+                {
+                    'id': str(t.id),
+                    'name': t.name,
+                    'title': t.title,
+                    'company': t.company,
+                    'content': t.content,
+                    'rating': t.rating,
+                }
+                for t in testimonials
+            ],
+        }
+        
+        return JsonResponse(data)
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=500)
+nano cms/api_urls.py
+from django.urls import path
+from . import api_views
+
+urlpatterns = [
+    path('homepage/', api_views.homepage_data, name='homepage-data'),
+]
+
+nano backend_config/urls.py
+from django.contrib import admin
+from django.urls import path, include
+
+urlpatterns = [
+    path('admin/', admin.site.urls),
+    path('api/v1/', include('cms.api_urls')),
+]
+
+python manage.py runserver
+

@@ -1,0 +1,25 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --deep-space: #0A0A0F;
+  --midnight-navy: #0F172A;
+  --electric-cyan: #00D9FF;
+  --plasma-blue: #0066FF;
+  --soft-gray: #94A3B8;
+}
+
+body {
+  background: var(--deep-space);
+  color: white;
+}
+
+@layer utilities {
+  .text-gradient {
+    background: linear-gradient(135deg, #00D9FF 0%, #0066FF 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+}
