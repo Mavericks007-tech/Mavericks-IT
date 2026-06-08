@@ -11,7 +11,7 @@ import type { HeroData, TrustStat } from '@/lib/api';
 const HeroScene = dynamic(() => import('@/components/three/HeroScene').then(m => m.HeroScene), {
   ssr: false,
   loading: () => (
-    <div className="absolute inset-0 -z-10 bg-gradient-radial from-electric-cyan/15 via-transparent to-transparent" />
+    <div className="absolute inset-0 -z-10" style={{ background: 'rgba(0, 217, 255, 0.06)' }} />
   ),
 });
 
@@ -35,9 +35,6 @@ export function HeroSection({ hero, trustStats = [] }: Props) {
   return (
     <section className="relative min-h-screen flex items-center overflow-hidden pt-20">
       <HeroScene />
-
-      {/* Vignette */}
-      <div className="absolute inset-0 -z-10 bg-gradient-to-b from-transparent via-deep-space/40 to-deep-space" />
 
       <Container className="relative z-10 py-16 sm:py-24">
         <motion.div
@@ -124,7 +121,7 @@ export function HeroSection({ hero, trustStats = [] }: Props) {
           className="absolute bottom-8 left-1/2 -translate-x-1/2 hidden sm:flex flex-col items-center gap-2"
         >
           <span className="text-xs uppercase tracking-widest text-soft-gray">Scroll</span>
-          <div className="w-px h-12 bg-gradient-to-b from-electric-cyan to-transparent" />
+          <div className="w-px h-12" style={{ background: 'rgba(0, 217, 255, 0.6)' }} />
         </motion.div>
       </Container>
     </section>

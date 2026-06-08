@@ -10,8 +10,8 @@ export function FinalCTA() {
   return (
     <Section className="relative overflow-hidden">
       <div className="absolute inset-0 -z-10">
-        <div className="absolute inset-0 bg-gradient-to-br from-plasma-blue/20 via-electric-cyan/10 to-transparent" />
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 h-[600px] w-[600px] rounded-full bg-electric-cyan/10 blur-[120px] animate-glow-pulse" />
+        <div className="absolute inset-0" style={{ background: 'rgba(0, 102, 255, 0.08)' }} />
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 h-[600px] w-[600px] rounded-full blur-[120px] animate-glow-pulse" style={{ background: 'rgba(0, 217, 255, 0.1)' }} />
       </div>
       <Container>
         <motion.div

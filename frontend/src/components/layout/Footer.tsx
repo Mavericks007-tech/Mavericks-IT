@@ -66,7 +66,7 @@ const COLUMNS = [
 export function Footer() {
   return (
     <footer className="relative border-t border-white/5 bg-midnight-navy/40 pt-20 pb-10">
-      <div className="absolute inset-0 -z-10 bg-gradient-radial from-electric-cyan/5 via-transparent to-transparent" />
+      <div className="absolute inset-0 -z-10" style={{ background: 'rgba(0, 217, 255, 0.03)' }} />
       <Container>
         <div className="grid grid-cols-2 gap-10 md:grid-cols-5 mb-16">
           <div className="col-span-2 md:col-span-1">

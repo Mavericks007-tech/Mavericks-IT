@@ -50,10 +50,10 @@ function ServiceCard({ service, index }: { service: Service; index: number }) {
         className="group relative h-full glass rounded-2xl p-6 transition-shadow duration-500 hover:shadow-glow-cyan will-change-transform"
         style={{
           transformStyle: 'preserve-3d',
-          background: 'radial-gradient(circle at var(--mouse-x, 50%) var(--mouse-y, 50%), rgba(0, 217, 255, 0.08), rgba(15, 23, 42, 0.6) 60%)',
+          background: 'rgba(15, 23, 42, 0.6)',
         }}
       >
-        <div className="mb-4 inline-flex items-center justify-center w-12 h-12 rounded-xl bg-gradient-to-br from-plasma-blue/20 to-electric-cyan/20 text-electric-cyan group-hover:scale-110 transition-transform duration-300">
+        <div className="mb-4 inline-flex items-center justify-center w-12 h-12 rounded-xl text-electric-cyan group-hover:scale-110 transition-transform duration-300" style={{ background: 'rgba(0, 217, 255, 0.15)' }}>
           <Icon size={24} />
         </div>
         <h3 className="font-display text-xl font-bold text-white mb-2">
@@ -62,7 +62,7 @@ function ServiceCard({ service, index }: { service: Service; index: number }) {
         <p className="text-sm text-soft-gray leading-relaxed">
           {service.subtitle}
         </p>
-        <div className="absolute inset-x-6 bottom-6 h-px bg-gradient-to-r from-transparent via-electric-cyan/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+        <div className="absolute inset-x-6 bottom-6 h-px opacity-0 group-hover:opacity-100 transition-opacity" style={{ background: 'rgba(0, 217, 255, 0.4)' }} />
       </div>
     </motion.div>
   );
@@ -72,7 +72,7 @@ export function ServicesGrid({ services }: { services: Service[] }) {
   if (!services?.length) return null;
 
   return (
-    <Section className="bg-gradient-premium">
+    <Section className="bg-surface-elevated">
       <Container>
         <motion.div
           initial={{ opacity: 0, y: 30 }}

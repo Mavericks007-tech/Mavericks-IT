@@ -25,7 +25,7 @@ export function DifferentiatorsSection({ items = [] }: { items?: Differentiator[
     : FALLBACK;
 
   return (
-    <Section className="bg-gradient-premium">
+    <Section className="bg-surface-elevated">
       <Container>
         <motion.div
           initial={{ opacity: 0, y: 30 }}
@@ -53,7 +53,7 @@ export function DifferentiatorsSection({ items = [] }: { items?: Differentiator[
                 transition={{ duration: 0.6, delay: i * 0.08 }}
                 className="glass rounded-2xl p-8 hover:shadow-glow-cyan transition-shadow duration-500"
               >
-                <div className="inline-flex w-14 h-14 mb-5 rounded-xl bg-gradient-to-br from-plasma-blue to-electric-cyan items-center justify-center text-white shadow-glow-blue">
+                <div className="inline-flex w-14 h-14 mb-5 rounded-xl items-center justify-center text-white shadow-glow-blue" style={{ background: 'rgba(0, 217, 255, 1)' }}>
                   <Icon size={26} />
                 </div>
                 <h3 className="font-display text-xl font-bold text-white mb-3">

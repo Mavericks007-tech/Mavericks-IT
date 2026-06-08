@@ -91,9 +91,9 @@ export function HeroScene() {
     // CSS fallback for low-tier / no-WebGL
     return (
       <div className="absolute inset-0 -z-10 overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-radial from-electric-cyan/15 via-transparent to-transparent" />
-        <div className="absolute top-1/2 left-1/2 h-[600px] w-[600px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-plasma-blue/20 blur-[120px] animate-glow-pulse" />
-        <div className="absolute top-1/4 right-1/4 h-[400px] w-[400px] rounded-full bg-electric-cyan/15 blur-[100px] animate-float" />
+        <div className="absolute inset-0" style={{ background: 'rgba(0, 217, 255, 0.06)' }} />
+        <div className="absolute top-1/2 left-1/2 h-[600px] w-[600px] -translate-x-1/2 -translate-y-1/2 rounded-full blur-[120px] animate-glow-pulse" style={{ background: 'rgba(0, 102, 255, 0.2)' }} />
+        <div className="absolute top-1/4 right-1/4 h-[400px] w-[400px] rounded-full blur-[100px] animate-float" style={{ background: 'rgba(0, 217, 255, 0.15)' }} />
       </div>
     );
   }

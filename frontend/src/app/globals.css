@@ -6,7 +6,7 @@
 @tailwind utilities;
 
 :root {
-  --color-bg: #0A0A0F;
+  --color-bg: #33337b;
   --color-bg-elevated: #0F172A;
   --color-text: #FFFFFF;
   --color-text-muted: #94A3B8;
@@ -23,7 +23,7 @@
 }
 
 html {
-  background: var(--color-bg);
+  background: rgba(51, 51, 123, 1);
   color: var(--color-text);
   font-family: 'Satoshi', 'Inter', system-ui, sans-serif;
   -webkit-tap-highlight-color: transparent;
@@ -31,7 +31,7 @@ html {
 }
 
 body {
-  background: var(--color-bg);
+  background: rgba(51, 51, 123, 1);
   color: var(--color-text);
   margin: 0;
   min-height: 100vh;
@@ -49,12 +49,12 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 ::-webkit-scrollbar { width: 8px; height: 8px; }
-::-webkit-scrollbar-track { background: var(--color-bg); }
+::-webkit-scrollbar-track { background: rgba(51, 51, 123, 1); }
 ::-webkit-scrollbar-thumb {
-  background: linear-gradient(180deg, #0066FF, #00D9FF);
+  background: rgba(0, 217, 255, 1);
   border-radius: 4px;
 }
-::-webkit-scrollbar-thumb:hover { background: #00D9FF; }
+::-webkit-scrollbar-thumb:hover { background: rgba(0, 102, 255, 1); }
 
 @layer utilities {
   .glass {
@@ -70,32 +70,15 @@ h1, h2, h3, h4, h5, h6 {
     border: 1px solid rgba(255, 255, 255, 0.12);
   }
   .text-gradient {
-    background: linear-gradient(135deg, #0066FF 0%, #00D9FF 100%);
-    -webkit-background-clip: text;
-    background-clip: text;
-    color: transparent;
+    color: rgba(0, 217, 255, 1);
   }
   .text-gradient-aurora {
-    background: linear-gradient(135deg, #00D9FF 0%, #00FF88 100%);
-    -webkit-background-clip: text;
-    background-clip: text;
-    color: transparent;
+    color: rgba(0, 255, 136, 1);
   }
   .border-gradient {
     position: relative;
-    background: var(--color-bg-elevated);
-  }
-  .border-gradient::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    padding: 1px;
-    background: linear-gradient(135deg, #0066FF, #00D9FF, transparent);
-    border-radius: inherit;
-    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-    -webkit-mask-composite: xor;
-    mask-composite: exclude;
-    pointer-events: none;
+    background: rgba(15, 23, 42, 1);
+    border: 1px solid rgba(0, 217, 255, 0.4);
   }
 }
 

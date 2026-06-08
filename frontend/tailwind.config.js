@@ -36,11 +36,10 @@ module.exports = {
         '3xl': '6rem',
         '4xl': '8rem',
       },
-      backgroundImage: {
-        'gradient-hero': 'linear-gradient(135deg, #0066FF 0%, #00D9FF 100%)',
-        'gradient-premium': 'linear-gradient(180deg, #0F172A 0%, #1E293B 100%)',
-        'gradient-radial': 'radial-gradient(ellipse at center, var(--tw-gradient-stops))',
-        'gradient-conic': 'conic-gradient(from var(--gradient-angle, 180deg), var(--tw-gradient-stops))',
+      backgroundColor: {
+        'surface': 'rgba(15, 23, 42, 1)',
+        'surface-elevated': 'rgba(30, 41, 59, 1)',
+        'surface-deep': 'rgba(51, 51, 123, 1)',
       },
       animation: {
         'glow-pulse': 'glow-pulse 3s ease-in-out infinite',
