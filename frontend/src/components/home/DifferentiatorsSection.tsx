@@ -1,28 +1,20 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import { Award, Shield, Zap, Search, HeartHandshake, Crown } from 'lucide-react';
+import {
+  Award, Shield, Zap, Search, HeartHandshake, Crown,
+  Code2, Globe, Cloud, Sparkles, type LucideIcon,
+} from 'lucide-react';
 
 import { Container, Section } from '@/components/ui/Container';
 import type { Differentiator } from '@/lib/api';
 
-const FALLBACK: Array<{ title: string; description: string; icon: any }> = [
-  { title: 'Engineering Excellence', description: 'Custom code, never templates. Every project built from scratch.', icon: Award },
-  { title: 'Security First', description: 'Bank-grade encryption on every project. We protect like a fortress.', icon: Shield },
-  { title: 'Speed & Performance', description: 'Sub-2-second load times guaranteed. Faster = more customers = more sales.', icon: Zap },
-  { title: 'SEO Built-In', description: 'Rank on Google from day one. SEO baked into every page.', icon: Search },
-  { title: 'Lifetime Support', description: "We don't disappear after launch. Partners, not vendors.", icon: HeartHandshake },
-  { title: 'Premium Quality', description: 'Award-worthy design meets enterprise reliability. Nothing less.', icon: Crown },
-];
-
-const ICONS: Record<string, any> = {
-  Award, Shield, Zap, Search, HeartHandshake, Crown,
+const ICONS: Record<string, LucideIcon> = {
+  Award, Shield, Zap, Search, HeartHandshake, Crown, Code2, Globe, Cloud, Sparkles,
 };
 
 export function DifferentiatorsSection({ items = [] }: { items?: Differentiator[] }) {
-  const cards = items.length
-    ? items.map((d) => ({ title: d.title, description: d.description, icon: ICONS[d.icon_name] || Award }))
-    : FALLBACK;
+  if (!items.length) return null;
 
   return (
     <Section>
@@ -42,11 +34,11 @@ export function DifferentiatorsSection({ items = [] }: { items?: Differentiator[
         </motion.div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {cards.map((card, i) => {
-            const Icon = card.icon;
+          {items.map((d, i) => {
+            const Icon = ICONS[d.icon_name] || Award;
             return (
               <motion.div
-                key={card.title}
+                key={d.id}
                 initial={{ opacity: 0, y: 40 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, margin: '-80px' }}
@@ -57,10 +49,10 @@ export function DifferentiatorsSection({ items = [] }: { items?: Differentiator[
                   <Icon size={26} />
                 </div>
                 <h3 className="font-display text-xl font-bold text-white mb-3">
-                  {card.title}
+                  {d.title}
                 </h3>
                 <p className="text-soft-gray leading-relaxed">
-                  {card.description}
+                  {d.description}
                 </p>
               </motion.div>
             );

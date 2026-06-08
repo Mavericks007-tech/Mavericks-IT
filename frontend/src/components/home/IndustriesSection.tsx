@@ -5,15 +5,8 @@ import { motion } from 'framer-motion';
 import { Container, Section } from '@/components/ui/Container';
 import type { Industry } from '@/lib/api';
 
-const FALLBACK_INDUSTRIES = [
-  'Corporate & Enterprise', 'E-commerce', 'F-commerce', 'Insta-commerce',
-  'Law Firms', 'Healthcare', 'Education', 'Restaurants',
-  'Real Estate', 'Garments / RMG', 'Logistics', 'Government',
-  'Modeling Agencies', 'Social Platforms', 'Personal Portfolios', 'Retail Shops',
-];
-
 export function IndustriesSection({ industries = [] }: { industries?: Industry[] }) {
-  const items = industries.length ? industries.map(i => i.name) : FALLBACK_INDUSTRIES;
+  if (!industries.length) return null;
 
   return (
     <Section>
@@ -37,9 +30,9 @@ export function IndustriesSection({ industries = [] }: { industries?: Industry[]
         </motion.div>
 
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
-          {items.map((name, i) => (
+          {industries.map((ind, i) => (
             <motion.div
-              key={name}
+              key={ind.id}
               initial={{ opacity: 0, scale: 0.92 }}
               whileInView={{ opacity: 1, scale: 1 }}
               viewport={{ once: true, margin: '-50px' }}
@@ -48,8 +41,13 @@ export function IndustriesSection({ industries = [] }: { industries?: Industry[]
               className="group glass rounded-xl p-5 text-center cursor-pointer transition-all duration-300 hover:border-electric-cyan/40 hover:shadow-glow-cyan"
             >
               <div className="text-sm font-semibold text-white group-hover:text-electric-cyan transition-colors">
-                {name}
+                {ind.name}
               </div>
+              {ind.description && (
+                <p className="mt-2 text-xs text-soft-gray opacity-0 group-hover:opacity-100 max-h-0 group-hover:max-h-24 transition-all duration-300 overflow-hidden">
+                  {ind.description}
+                </p>
+              )}
             </motion.div>
           ))}
         </div>

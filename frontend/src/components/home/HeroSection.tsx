@@ -20,17 +20,14 @@ interface Props {
   trustStats?: TrustStat[];
 }
 
-const FALLBACK_HERO: HeroData = {
-  headline: "Bangladesh's Most Trusted Technology Partner",
-  subheadline: 'We design, develop, and deploy world-class software, websites, and digital solutions for ambitious businesses — from neighborhood shops to multinational corporations.',
-  primary_cta_text: 'Get a Free Consultation',
-  primary_cta_link: '/contact',
-  secondary_cta_text: 'View Our Work',
-  secondary_cta_link: '/portfolio',
-};
-
 export function HeroSection({ hero, trustStats = [] }: Props) {
-  const h = hero || FALLBACK_HERO;
+  if (!hero) {
+    return (
+      <section className="relative min-h-screen flex items-center justify-center">
+        <p className="text-soft-gray">Loading...</p>
+      </section>
+    );
+  }
 
   return (
     <section className="relative min-h-screen flex items-center overflow-hidden pt-20">
@@ -54,7 +51,7 @@ export function HeroSection({ hero, trustStats = [] }: Props) {
           </motion.span>
 
           <h1 className="font-display text-h1 text-white mb-6 text-balance">
-            {h.headline.split(' ').map((word, i) => (
+            {hero.headline.split(' ').map((word, i) => (
               <motion.span
                 key={i}
                 initial={{ opacity: 0, y: 20 }}
@@ -77,7 +74,7 @@ export function HeroSection({ hero, trustStats = [] }: Props) {
             transition={{ delay: 0.6 }}
             className="text-body-lg text-soft-gray max-w-2xl mx-auto mb-10"
           >
-            {h.subheadline}
+            {hero.subheadline}
           </motion.p>
 
           <motion.div
@@ -86,11 +83,11 @@ export function HeroSection({ hero, trustStats = [] }: Props) {
             transition={{ delay: 0.8 }}
             className="flex flex-col sm:flex-row gap-4 justify-center"
           >
-            <Button href={h.primary_cta_link} size="lg">
-              {h.primary_cta_text} <ArrowRight size={18} />
+            <Button href={hero.primary_cta_link} size="lg">
+              {hero.primary_cta_text} <ArrowRight size={18} />
             </Button>
-            <Button href={h.secondary_cta_link} size="lg" variant="secondary">
-              {h.secondary_cta_text}
+            <Button href={hero.secondary_cta_link} size="lg" variant="secondary">
+              {hero.secondary_cta_text}
             </Button>
           </motion.div>
         </motion.div>
@@ -112,7 +109,6 @@ export function HeroSection({ hero, trustStats = [] }: Props) {
             ))}
           </motion.div>
         )}
-
       </Container>
     </section>
   );
