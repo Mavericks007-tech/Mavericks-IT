@@ -1,5 +1,6 @@
 from django.core.exceptions import ValidationError
 from django.db import models
+from django_ckeditor_5.fields import CKEditor5Field
 from simple_history.models import HistoricalRecords
 
 from core.models import BaseModel
@@ -196,7 +197,7 @@ class Page(BaseModel):
     ]
     title = models.CharField(max_length=200)
     slug = models.SlugField(max_length=200, unique=True)
-    body = models.TextField(blank=True, help_text="Markdown or HTML")
+    body = CKEditor5Field(config_name='extends', blank=True, help_text="Rich-text editor — paste HTML or use toolbar")
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='draft')
     featured_image = models.ForeignKey(
         MediaAsset, on_delete=models.SET_NULL, null=True, blank=True, related_name='pages'

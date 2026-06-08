@@ -7,3 +7,4 @@ django-simple-history>=3.7
 Pillow>=10.0
 psycopg2-binary>=2.9
 python-decouple>=3.8
+django-ckeditor-5>=0.2

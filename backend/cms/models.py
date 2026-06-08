@@ -1,6 +1,7 @@
 from django.db import models
 from django.core.exceptions import ValidationError
 from django.utils import timezone
+from django_ckeditor_5.fields import CKEditor5Field
 from core.models import BaseModel
 
 class HeroSection(BaseModel):
@@ -134,7 +135,7 @@ class BlogPost(BaseModel):
     title = models.CharField(max_length=200)
     slug = models.SlugField(unique=True)
     excerpt = models.TextField()
-    content = models.TextField()
+    content = CKEditor5Field(config_name='extends', blank=True)
     featured_image = models.CharField(max_length=500)
     author = models.CharField(max_length=100)
     author_avatar = models.CharField(max_length=500, blank=True)
