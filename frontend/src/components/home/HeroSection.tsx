@@ -113,16 +113,6 @@ export function HeroSection({ hero, trustStats = [] }: Props) {
           </motion.div>
         )}
 
-        {/* Scroll cue */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 1.4 }}
-          className="absolute bottom-8 left-1/2 -translate-x-1/2 hidden sm:flex flex-col items-center gap-2"
-        >
-          <span className="text-xs uppercase tracking-widest text-soft-gray">Scroll</span>
-          <div className="w-px h-12" style={{ background: 'rgba(0, 217, 255, 0.6)' }} />
-        </motion.div>
       </Container>
     </section>
   );
