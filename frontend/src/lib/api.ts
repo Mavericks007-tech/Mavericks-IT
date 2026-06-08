@@ -1,4 +1,8 @@
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api/v1';
+/**
+ * Typed API client for Mavericks Tech backend.
+ * All fetches go through here. Easily swap base URL for prod.
+ */
+export const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api/v1';
 
 export interface Service {
   id: string;
@@ -7,7 +11,9 @@ export interface Service {
   simple_explanation: string;
   icon_name: string;
   order: number;
-  cta_link: string;
+  cta_link?: string;
+  gradient_from?: string;
+  gradient_to?: string;
 }
 
 export interface Testimonial {
@@ -17,7 +23,7 @@ export interface Testimonial {
   company: string;
   content: string;
   rating: number;
-  service_used: string;
+  service_used?: string;
 }
 
 export interface TrustStat {
@@ -25,16 +31,15 @@ export interface TrustStat {
   label: string;
   value: string;
   numeric_value: number;
-  suffix: string;
-  order: number;
+  suffix?: string;
 }
 
 export interface Industry {
   id: string;
   name: string;
   icon_name: string;
-  description: string;
-  example_service: string;
+  description?: string;
+  example_service?: string;
 }
 
 export interface Differentiator {
@@ -51,9 +56,9 @@ export interface HeroData {
   primary_cta_link: string;
   secondary_cta_text: string;
   secondary_cta_link: string;
-  gradient_start: string;
-  gradient_end: string;
-  particle_count: number;
+  gradient_start?: string;
+  gradient_end?: string;
+  particle_count?: number;
 }
 
 export interface HomepageData {
@@ -61,37 +66,54 @@ export interface HomepageData {
   services: Service[];
   testimonials: Testimonial[];
   trust_stats: TrustStat[];
-  industries: Industry[];
-  differentiators: Differentiator[];
+  industries?: Industry[];
+  differentiators?: Differentiator[];
 }
 
-export async function fetchHomepageData(): Promise<HomepageData> {
-  try {
-    const response = await fetch(`${API_BASE_URL}/homepage/`);
-    if (!response.ok) {
-      throw new Error(`API error: ${response.status}`);
-    }
-    return await response.json();
-  } catch (error) {
-    console.error('Error fetching homepage data:', error);
-    // Return fallback data
-    return {
-      hero: {
-        headline: "Bangladesh's Most Trusted Technology Partner",
-        subheadline: "We design, develop, and deploy world-class software, websites, and digital solutions for ambitious businesses",
-        primary_cta_text: "Get a Free Consultation",
-        primary_cta_link: "/contact",
-        secondary_cta_text: "View Our Work",
-        secondary_cta_link: "/portfolio",
-        gradient_start: "#0A0A0F",
-        gradient_end: "#0F172A",
-        particle_count: 50,
-      },
-      services: [],
-      testimonials: [],
-      trust_stats: [],
-      industries: [],
-      differentiators: [],
-    };
-  }
+async function safeFetch<T>(path: string, init?: RequestInit): Promise<T> {
+  const res = await fetch(`${API_BASE}${path}`, {
+    ...init,
+    headers: {
+      'Content-Type': 'application/json',
+      ...(init?.headers || {}),
+    },
+    cache: 'no-store',
+  });
+  if (!res.ok) throw new Error(`API ${res.status}: ${path}`);
+  return res.json() as Promise<T>;
 }
+
+export const api = {
+  homepage: () => safeFetch<HomepageData>('/homepage/'),
+
+  // Public lead capture (no auth)
+  submitLead: (data: {
+    full_name: string;
+    email: string;
+    phone?: string;
+    company_name?: string;
+    industry?: string;
+    service_interest?: string[];
+    notes?: string;
+  }) => safeFetch<{ id: string }>('/crm/public/leads/', {
+    method: 'POST',
+    body: JSON.stringify(data),
+  }),
+
+  // Portal (auth via Bearer token)
+  portal: {
+    me: (token: string) => safeFetch('/portal/me/', {
+      headers: { Authorization: `Bearer ${token}` },
+    }),
+    projects: (token: string) => safeFetch('/portal/projects/', {
+      headers: { Authorization: `Bearer ${token}` },
+    }),
+    invoices: (token: string) => safeFetch('/portal/invoices/', {
+      headers: { Authorization: `Bearer ${token}` },
+    }),
+    requestAccess: (email: string) => safeFetch('/portal/request-access/', {
+      method: 'POST',
+      body: JSON.stringify({ email }),
+    }),
+  },
+};
