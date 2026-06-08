@@ -32,17 +32,56 @@ html {
 
 body {
   background: linear-gradient(
-    135deg,
+    var(--bg-angle, 135deg),
     rgba(0, 0, 0, 1) 0%,
-    rgba(0, 0, 0, 1) 40%,
-    rgba(0, 60, 90, 1) 75%,
-    rgba(0, 180, 220, 0.85) 100%
+    rgba(0, 0, 0, 1) 45%,
+    rgba(0, 40, 60, 0.95) 78%,
+    rgba(0, 140, 180, 0.75) 100%
   );
   background-attachment: fixed;
   color: var(--color-text);
   margin: 0;
   min-height: 100vh;
   overflow-x: hidden;
+  animation: bg-dance 14s ease-in-out infinite;
+  position: relative;
+}
+
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  background:
+    radial-gradient(circle at 90% 80%, rgba(0, 217, 255, 0.18), transparent 45%),
+    radial-gradient(circle at 70% 95%, rgba(0, 200, 255, 0.12), transparent 50%);
+  filter: blur(40px);
+  animation: blue-drift 12s ease-in-out infinite alternate;
+}
+
+@keyframes blue-drift {
+  0%   { transform: translate3d(0, 0, 0) scale(1); opacity: 0.85; }
+  50%  { transform: translate3d(-20px, -10px, 0) scale(1.08); opacity: 1; }
+  100% { transform: translate3d(15px, -20px, 0) scale(0.95); opacity: 0.7; }
+}
+
+@property --bg-angle {
+  syntax: '<angle>';
+  initial-value: 135deg;
+  inherits: false;
+}
+
+@keyframes bg-dance {
+  0%   { --bg-angle: 130deg; }
+  25%  { --bg-angle: 145deg; }
+  50%  { --bg-angle: 155deg; }
+  75%  { --bg-angle: 140deg; }
+  100% { --bg-angle: 130deg; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  body { animation: none; }
 }
 
 h1, h2, h3, h4, h5, h6 {
