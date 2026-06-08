@@ -25,7 +25,7 @@ export function DifferentiatorsSection({ items = [] }: { items?: Differentiator[
     : FALLBACK;
 
   return (
-    <Section className="bg-surface-elevated">
+    <Section>
       <Container>
         <motion.div
           initial={{ opacity: 0, y: 30 }}

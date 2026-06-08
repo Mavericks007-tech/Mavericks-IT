@@ -72,7 +72,7 @@ export function ServicesGrid({ services }: { services: Service[] }) {
   if (!services?.length) return null;
 
   return (
-    <Section className="bg-surface-elevated">
+    <Section>
       <Container>
         <motion.div
           initial={{ opacity: 0, y: 30 }}
