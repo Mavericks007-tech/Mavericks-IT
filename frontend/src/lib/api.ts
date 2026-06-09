@@ -1,19 +1,22 @@
 /**
  * Typed API client for Mavericks Tech backend.
- * All fetches go through here.
  */
 export const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api/v1';
 
 export interface Service {
   id: string;
   title: string;
+  slug: string;
   subtitle: string;
   simple_explanation: string;
+  long_description: string;
   icon_name: string;
   order: number;
   cta_link?: string;
   gradient_from?: string;
   gradient_to?: string;
+  starting_price?: string | null;
+  currency?: string;
 }
 
 export interface Testimonial {
@@ -37,8 +40,10 @@ export interface TrustStat {
 export interface Industry {
   id: string;
   name: string;
+  slug: string;
   icon_name: string;
   description?: string;
+  long_description?: string;
   example_service?: string;
 }
 
@@ -66,6 +71,46 @@ export interface CaseStudy {
   metric: string;
   metric_description: string;
   image_url?: string;
+}
+
+export interface CaseStudyDetail extends CaseStudy {
+  description: string;
+  challenge: string;
+  solution: string;
+  results: string[];
+  logo_url?: string;
+  testimonial_quote: string;
+  testimonial_author: string;
+  testimonial_title: string;
+  technologies: string[];
+}
+
+export interface BlogPost {
+  id: string;
+  title: string;
+  slug: string;
+  excerpt: string;
+  featured_image: string;
+  author: string;
+  read_time: number;
+  category: string;
+  tags: string[];
+  published_at: string;
+}
+
+export interface BlogPostDetail extends BlogPost {
+  content: string;
+  author_avatar?: string;
+  views: number;
+}
+
+export interface PageDetail {
+  id: string;
+  title: string;
+  slug: string;
+  body: string;
+  status: string;
+  featured_image?: string | null;
 }
 
 export interface HeroData {
@@ -137,18 +182,8 @@ export interface SiteSettings {
   whatsapp_number: string;
   office_address: string;
   office_hours: string;
-  social: {
-    linkedin: string;
-    facebook: string;
-    instagram: string;
-    youtube: string;
-    twitter: string;
-  };
-  analytics: {
-    google_analytics_id: string;
-    google_tag_manager_id: string;
-    facebook_pixel_id: string;
-  };
+  social: { linkedin: string; facebook: string; instagram: string; youtube: string; twitter: string };
+  analytics: { google_analytics_id: string; google_tag_manager_id: string; facebook_pixel_id: string };
 }
 
 export interface SiteData {
@@ -185,24 +220,33 @@ export interface SeoData {
   schemas: SchemaData[];
 }
 
-async function safeFetch<T>(path: string, init?: RequestInit): Promise<T> {
-  const res = await fetch(`${API_BASE}${path}`, {
-    ...init,
-    headers: {
-      'Content-Type': 'application/json',
-      ...(init?.headers || {}),
-    },
-    cache: 'no-store',
-  });
-  if (!res.ok) throw new Error(`API ${res.status}: ${path}`);
-  return res.json() as Promise<T>;
+async function safeFetch<T>(path: string, init?: RequestInit): Promise<T | null> {
+  try {
+    const res = await fetch(`${API_BASE}${path}`, {
+      ...init,
+      headers: { 'Content-Type': 'application/json', ...(init?.headers || {}) },
+      next: { revalidate: 60 },
+    });
+    if (!res.ok) return null;
+    return res.json() as Promise<T>;
+  } catch {
+    return null;
+  }
 }
 
 export const api = {
   homepage: () => safeFetch<HomepageData>('/homepage/'),
   site: () => safeFetch<SiteData>('/site/'),
   seo: (path: string) => safeFetch<SeoData>(`/seo/?path=${encodeURIComponent(path)}`),
-
+  services: () => safeFetch<{ results: Service[] }>('/services/'),
+  service: (slug: string) => safeFetch<Service>(`/services/${slug}/`),
+  industries: () => safeFetch<{ results: Industry[] }>('/industries/'),
+  industry: (slug: string) => safeFetch<Industry>(`/industries/${slug}/`),
+  page: (slug: string) => safeFetch<PageDetail>(`/pages/${slug}/`),
+  blog: () => safeFetch<{ results: BlogPost[] }>('/blog/'),
+  blogPost: (slug: string) => safeFetch<BlogPostDetail>(`/blog/${slug}/`),
+  portfolio: () => safeFetch<{ results: CaseStudy[] }>('/portfolio/'),
+  caseStudy: (id: string) => safeFetch<CaseStudyDetail>(`/portfolio/${id}/`),
   submitLead: (data: {
     full_name: string;
     email: string;
@@ -211,55 +255,15 @@ export const api = {
     industry?: string;
     service_interest?: string[];
     notes?: string;
-  }) => safeFetch<{ id: string }>('/crm/public/leads/', {
-    method: 'POST',
-    body: JSON.stringify(data),
-  }),
-
-  portal: {
-    me: (token: string) => safeFetch('/portal/me/', {
-      headers: { Authorization: `Bearer ${token}` },
-    }),
-    projects: (token: string) => safeFetch('/portal/projects/', {
-      headers: { Authorization: `Bearer ${token}` },
-    }),
-    invoices: (token: string) => safeFetch('/portal/invoices/', {
-      headers: { Authorization: `Bearer ${token}` },
-    }),
-    requestAccess: (email: string) => safeFetch('/portal/request-access/', {
+  }) =>
+    fetch(`${API_BASE}/crm/public/leads/`, {
       method: 'POST',
-      body: JSON.stringify({ email }),
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data),
     }),
-  },
 };
 
-// Server-side fetch helpers (for Next.js app router)
-export async function fetchSite(): Promise<SiteData | null> {
-  try {
-    const res = await fetch(`${API_BASE}/site/`, { next: { revalidate: 60 } });
-    if (!res.ok) return null;
-    return res.json();
-  } catch {
-    return null;
-  }
-}
-
-export async function fetchHomepage(): Promise<HomepageData | null> {
-  try {
-    const res = await fetch(`${API_BASE}/homepage/`, { next: { revalidate: 60 } });
-    if (!res.ok) return null;
-    return res.json();
-  } catch {
-    return null;
-  }
-}
-
-export async function fetchSeo(path: string): Promise<SeoData | null> {
-  try {
-    const res = await fetch(`${API_BASE}/seo/?path=${encodeURIComponent(path)}`, { next: { revalidate: 300 } });
-    if (!res.ok) return null;
-    return res.json();
-  } catch {
-    return null;
-  }
-}
+// Server-side helpers
+export const fetchSite = () => api.site();
+export const fetchHomepage = () => api.homepage();
+export const fetchSeo = (path: string) => api.seo(path);

@@ -28,18 +28,28 @@ class HeroSection(BaseModel):
 class Service(BaseModel):
     """Service cards displayed on homepage"""
     title = models.CharField(max_length=100)
+    slug = models.SlugField(max_length=120, unique=True, blank=True)
     subtitle = models.CharField(max_length=200)
     simple_explanation = models.TextField()
+    long_description = models.TextField(blank=True, help_text="Full detail page body. HTML allowed.")
     icon_name = models.CharField(max_length=50)
     gradient_from = models.CharField(max_length=20, default="#00D9FF")
     gradient_to = models.CharField(max_length=20, default="#0066FF")
     order = models.IntegerField(default=0)
     is_featured = models.BooleanField(default=True)
     cta_link = models.CharField(max_length=200, blank=True)
-    
+    starting_price = models.DecimalField(max_digits=12, decimal_places=2, null=True, blank=True)
+    currency = models.CharField(max_length=10, default='BDT')
+
     class Meta:
         db_table = 'cms_services'
         ordering = ['order']
+
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            from django.utils.text import slugify
+            self.slug = slugify(self.title)
+        super().save(*args, **kwargs)
 
 class Testimonial(BaseModel):
     """Client testimonials"""
@@ -72,15 +82,23 @@ class TrustStat(BaseModel):
 class Industry(BaseModel):
     """Industry served section"""
     name = models.CharField(max_length=100)
+    slug = models.SlugField(max_length=120, unique=True, blank=True)
     icon_name = models.CharField(max_length=50)
     description = models.TextField(blank=True)
+    long_description = models.TextField(blank=True, help_text="Full detail page body. HTML allowed.")
     example_service = models.CharField(max_length=200, blank=True)
     order = models.IntegerField(default=0)
     is_active = models.BooleanField(default=True)
-    
+
     class Meta:
         db_table = 'cms_industries'
         ordering = ['order']
+
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            from django.utils.text import slugify
+            self.slug = slugify(self.name)
+        super().save(*args, **kwargs)
 
 class CaseStudy(BaseModel):
     """Featured case study"""
