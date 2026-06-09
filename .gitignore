@@ -48,3 +48,9 @@ Thumbs.db
 # Editor crash residue
 *.save
 
+
+# Local tmp scratch
+.tmp/
+backups/
+
+frontend/tsconfig.tsbuildinfo

@@ -190,6 +190,11 @@ def site_settings(request):
                 'google_tag_manager_id': settings_obj.google_tag_manager_id if settings_obj else '',
                 'facebook_pixel_id': settings_obj.facebook_pixel_id if settings_obj else '',
             },
+            'verification': {
+                'google': settings_obj.gsc_verification if settings_obj else '',
+                'bing': settings_obj.bing_verification if settings_obj else '',
+            },
+            'og_default_image': settings_obj.og_default_image.url if settings_obj and settings_obj.og_default_image else None,
         } if settings_obj else None,
         'header_nav': [_nav_item(it) for it in (header_menu.items.filter(is_active=True).order_by('order') if header_menu else [])],
         'footer_columns': [

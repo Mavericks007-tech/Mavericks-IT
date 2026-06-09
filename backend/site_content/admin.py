@@ -16,6 +16,7 @@ class SiteSettingsAdmin(SimpleHistoryAdmin):
         ('Contact', {'fields': ('contact_email', 'contact_phone', 'whatsapp_number', 'office_address', 'office_hours')}),
         ('Social', {'fields': ('linkedin_url', 'facebook_url', 'instagram_url', 'youtube_url', 'twitter_url')}),
         ('Analytics', {'fields': ('google_analytics_id', 'google_tag_manager_id', 'facebook_pixel_id')}),
+        ('SEO / Verification', {'fields': ('gsc_verification', 'bing_verification', 'og_default_image')}),
         ('Business', {'fields': ('default_currency', 'vat_percent')}),
     )
 

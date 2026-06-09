@@ -1,24 +1,34 @@
 import type { Metadata, Viewport } from 'next';
 
+import { Analytics, GtmNoscript } from '@/components/analytics/Analytics';
 import { Footer } from '@/components/layout/Footer';
 import { Navbar } from '@/components/layout/Navbar';
 import { CursorTrail } from '@/components/effects/CursorTrail';
 import { LoadingScreen } from '@/components/effects/LoadingScreen';
 import { MagneticCursor } from '@/components/effects/MagneticCursor';
 import { PageTransition } from '@/components/effects/PageTransition';
+import { ServiceWorkerRegister } from '@/components/effects/ServiceWorkerRegister';
 import { SmoothScroll } from '@/components/effects/SmoothScroll';
 import { ChromeWrapper } from '@/components/layout/ChromeWrapper';
 import { fetchSeo, fetchSite } from '@/lib/api';
 
 import './globals.css';
 
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://maverickstech.com.bd';
+const OG_DEFAULT = '/og-default.png';
+
 export async function generateMetadata(): Promise<Metadata> {
   const [seo, site] = await Promise.all([fetchSeo('/'), fetchSite()]);
   const meta = seo?.meta;
   const settings = site?.settings;
+  const ogFallback = settings?.og_default_image ?? OG_DEFAULT;
+
+  const verification: Metadata['verification'] = {};
+  if (settings?.verification?.google) verification.google = settings.verification.google;
+  if (settings?.verification?.bing) verification.other = { 'msvalidate.01': settings.verification.bing };
 
   return {
-    metadataBase: new URL('https://maverickstech.com.bd'),
+    metadataBase: new URL(SITE_URL),
     title: {
       default: meta?.title ?? settings?.site_name ?? 'Mavericks Tech | Best Software Company in Bangladesh',
       template: `%s | ${settings?.site_name ?? 'Mavericks Tech Bangladesh'}`,
@@ -27,20 +37,22 @@ export async function generateMetadata(): Promise<Metadata> {
     keywords: meta?.primary_keywords && meta.primary_keywords.length > 0 ? meta.primary_keywords : undefined,
     authors: [{ name: settings?.site_name ?? 'Mavericks Tech Bangladesh' }],
     creator: settings?.site_name ?? 'Mavericks Tech Bangladesh',
+    manifest: '/manifest.webmanifest',
+    applicationName: settings?.site_name ?? 'Mavericks Tech Bangladesh',
     openGraph: {
       type: 'website',
       locale: 'en_US',
-      url: 'https://maverickstech.com.bd',
+      url: SITE_URL,
       siteName: settings?.site_name ?? 'Mavericks Tech Bangladesh',
       title: meta?.og_title ?? meta?.title ?? "Mavericks Tech | Bangladesh's Most Trusted Technology Partner",
       description: meta?.og_description ?? meta?.description ?? settings?.tagline ?? '',
-      images: meta?.og_image ? [meta.og_image] : undefined,
+      images: [meta?.og_image ?? ogFallback],
     },
     twitter: {
       card: 'summary_large_image',
       title: meta?.twitter_title ?? meta?.title ?? '',
       description: meta?.twitter_description ?? meta?.description ?? '',
-      images: meta?.twitter_image ? [meta.twitter_image] : undefined,
+      images: [meta?.twitter_image ?? ogFallback],
     },
     robots: meta?.robots
       ? {
@@ -48,9 +60,16 @@ export async function generateMetadata(): Promise<Metadata> {
           follow: meta.robots.includes('follow') && !meta.robots.includes('nofollow'),
         }
       : undefined,
+    verification: Object.keys(verification).length ? verification : undefined,
     icons: {
       icon: [
         { url: settings?.favicon ?? '/favicon.svg', type: 'image/svg+xml' },
+        { url: '/icons/favicon-32.png', sizes: '32x32', type: 'image/png' },
+        { url: '/icons/favicon-16.png', sizes: '16x16', type: 'image/png' },
+      ],
+      apple: [{ url: '/icons/apple-touch-icon.png', sizes: '180x180' }],
+      other: [
+        { rel: 'mask-icon', url: '/favicon.svg', color: '#00D9FF' },
       ],
     },
   };
@@ -65,8 +84,9 @@ export const viewport: Viewport = {
 };
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
-  const seo = await fetchSeo('/');
+  const [seo, site] = await Promise.all([fetchSeo('/'), fetchSite()]);
   const schemas = seo?.schemas ?? [];
+  const a = site?.settings?.analytics;
 
   return (
     <html lang="en" className="dark">
@@ -84,8 +104,14 @@ export default async function RootLayout({ children }: { children: React.ReactNo
             }}
           />
         ))}
+        <Analytics
+          ga4={a?.google_analytics_id || undefined}
+          gtm={a?.google_tag_manager_id || undefined}
+          pixel={a?.facebook_pixel_id || undefined}
+        />
       </head>
       <body className="bg-deep-space text-white font-body antialiased">
+        <GtmNoscript gtm={a?.google_tag_manager_id || undefined} />
         <LoadingScreen />
         <MagneticCursor />
         <CursorTrail />
@@ -96,6 +122,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
             </PageTransition>
           </ChromeWrapper>
         </SmoothScroll>
+        <ServiceWorkerRegister />
       </body>
     </html>
   );

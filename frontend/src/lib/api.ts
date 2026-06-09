@@ -184,6 +184,8 @@ export interface SiteSettings {
   office_hours: string;
   social: { linkedin: string; facebook: string; instagram: string; youtube: string; twitter: string };
   analytics: { google_analytics_id: string; google_tag_manager_id: string; facebook_pixel_id: string };
+  verification?: { google: string; bing: string };
+  og_default_image?: string | null;
 }
 
 export interface SiteData {

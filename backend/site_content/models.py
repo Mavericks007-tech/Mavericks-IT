@@ -22,9 +22,18 @@ class SiteSettings(BaseModel):
     instagram_url = models.URLField(blank=True)
     youtube_url = models.URLField(blank=True)
     twitter_url = models.URLField(blank=True)
-    google_analytics_id = models.CharField(max_length=50, blank=True)
-    google_tag_manager_id = models.CharField(max_length=50, blank=True)
+    google_analytics_id = models.CharField(max_length=50, blank=True, help_text="GA4 measurement ID, e.g. G-XXXXXXX")
+    google_tag_manager_id = models.CharField(max_length=50, blank=True, help_text="GTM container ID, e.g. GTM-XXXXX")
     facebook_pixel_id = models.CharField(max_length=50, blank=True)
+    gsc_verification = models.CharField(
+        max_length=200, blank=True,
+        help_text="Google Search Console site-verification token (content value only)",
+    )
+    bing_verification = models.CharField(max_length=200, blank=True)
+    og_default_image = models.ImageField(
+        upload_to='site/', blank=True, null=True,
+        help_text="Fallback OG/Twitter share image (1200x630 jpg). Used when a page has no og_image.",
+    )
     default_currency = models.CharField(max_length=10, default="BDT")
     vat_percent = models.DecimalField(max_digits=5, decimal_places=2, default=15.00)
     history = HistoricalRecords()
