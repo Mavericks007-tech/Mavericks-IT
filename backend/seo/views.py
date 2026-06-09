@@ -12,8 +12,7 @@ from site_content.models import Page
 def sitemap_feed(request):
     """Return all crawlable slugs grouped by type. Consumed by Next /sitemap.xml route."""
     services = list(
-        Service.objects.filter(is_active=True)
-        .values('slug', 'updated_at')
+        Service.objects.all().values('slug', 'updated_at')
     )
     industries = list(
         Industry.objects.filter(is_active=True)

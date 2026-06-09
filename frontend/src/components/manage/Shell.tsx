@@ -2,7 +2,7 @@
 
 import {
   LayoutDashboard, Users, Briefcase, FileText, Receipt,
-  Mail, BarChart3, Settings, LogOut, Menu, X, Building2,
+  Mail, BarChart3, Settings, LogOut, Menu, X, Building2, History,
 } from 'lucide-react';
 import { usePathname, useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
@@ -20,6 +20,7 @@ const NAV = [
   { href: '/manage/invoices', label: 'Invoices', icon: Receipt },
   { href: '/manage/email', label: 'Email', icon: Mail },
   { href: '/manage/reports', label: 'Reports', icon: BarChart3 },
+  { href: '/manage/audit', label: 'Audit Log', icon: History },
   { href: '/manage/settings', label: 'Settings', icon: Settings },
 ];
 

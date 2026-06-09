@@ -139,7 +139,15 @@ class ProcessStep(BaseModel):
     """Process section steps"""
     step_number = models.IntegerField()
     title = models.CharField(max_length=100)
-    description = models.TextField()
+    description = models.TextField(help_text="Short summary shown in process timeline")
+    long_description = models.TextField(
+        blank=True,
+        help_text="Expanded detail shown on /process step detail or expand-on-hover",
+    )
+    deliverables = models.JSONField(
+        default=list, blank=True,
+        help_text='List of strings, e.g. ["Discovery doc","Wireframes","Stakeholder map"]',
+    )
     duration = models.CharField(max_length=50)
     icon_name = models.CharField(max_length=50)
     order = models.IntegerField(default=0)

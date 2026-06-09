@@ -49,6 +49,28 @@ export interface AdminUser {
   groups: string[];
 }
 
+export interface AuditEntry {
+  id: string;
+  model: string;
+  app: string;
+  object_repr: string;
+  object_id: string;
+  action: 'create' | 'update' | 'delete' | string;
+  user: string | null;
+  user_id: number | null;
+  timestamp: string;
+  change_reason: string;
+  snapshot?: Record<string, unknown>;
+}
+
+export interface AuditFeed {
+  total: number;
+  limit: number;
+  offset: number;
+  results: AuditEntry[];
+  available_models: string[];
+}
+
 export const manage = {
   // Auth
   csrf: () => ensureCsrf(),
@@ -70,6 +92,9 @@ export const manage = {
   projectProfitability: () => manageFetch('/reports/projects/profitability/'),
   teamPerformance: () => manageFetch('/reports/team/performance/'),
   emailStats: () => manageFetch('/reports/email/stats/'),
+  auditLog: (params = '') => manageFetch<AuditFeed>(`/reports/audit/${params}`),
+  auditObject: (app: string, model: string, id: string) =>
+    manageFetch<{ results: AuditEntry[] }>(`/reports/audit/${app}/${model}/${id}/`),
 
   // CRM
   leads: (params = '') => manageFetch(`/crm/leads/${params}`),

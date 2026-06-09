@@ -1,11 +1,14 @@
 from django.urls import path
 
-from . import views
+from . import audit_views, views
 
 app_name = 'reports'
 
 urlpatterns = [
     path('dashboard/', views.dashboard, name='dashboard'),
+    path('audit/', audit_views.audit_log, name='audit-log'),
+    path('audit/<str:app_label>/<str:model_name>/<uuid:object_id>/',
+         audit_views.audit_object, name='audit-object'),
     path('sales-funnel/', views.sales_funnel, name='sales-funnel'),
     path('lead-sources/', views.lead_sources, name='lead-sources'),
     path('revenue/by-month/', views.revenue_by_month, name='revenue-by-month'),

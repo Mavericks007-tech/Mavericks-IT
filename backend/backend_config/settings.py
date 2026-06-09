@@ -78,28 +78,20 @@ TEMPLATES = [
 WSGI_APPLICATION = 'backend_config.wsgi.application'
 
 # ---------------------------------------------------------------------------
-# Database — Postgres in prod, SQLite optional for dev via DB_ENGINE=sqlite
+# Database — Postgres only. No SQLite. Set DB_* in .env.
 # ---------------------------------------------------------------------------
-if config('DB_ENGINE', default='postgres') == 'sqlite':
-    DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.sqlite3',
-            'NAME': BASE_DIR / 'db.sqlite3',
-        }
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': config('DB_NAME', default='mavericks_tech'),
+        'USER': config('DB_USER', default=os.environ.get('USER', 'postgres')),
+        'PASSWORD': config('DB_PASSWORD', default=''),
+        'HOST': config('DB_HOST', default='localhost'),
+        'PORT': config('DB_PORT', default='5432'),
+        'CONN_MAX_AGE': config('DB_CONN_MAX_AGE', default=600, cast=int),
+        'CONN_HEALTH_CHECKS': True,
     }
-else:
-    DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.postgresql',
-            'NAME': config('DB_NAME', default='mavericks_tech'),
-            'USER': config('DB_USER', default=os.environ.get('USER', 'postgres')),
-            'PASSWORD': config('DB_PASSWORD', default=''),
-            'HOST': config('DB_HOST', default='localhost'),
-            'PORT': config('DB_PORT', default='5432'),
-            'CONN_MAX_AGE': config('DB_CONN_MAX_AGE', default=600, cast=int),
-            'CONN_HEALTH_CHECKS': True,
-        }
-    }
+}
 
 # Upload limits
 DATA_UPLOAD_MAX_MEMORY_SIZE = None
