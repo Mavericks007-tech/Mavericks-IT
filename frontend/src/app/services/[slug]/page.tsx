@@ -2,6 +2,7 @@ import { ArrowRight } from 'lucide-react';
 import { notFound } from 'next/navigation';
 import type { Metadata } from 'next';
 
+import { ServiceSceneLazy } from '@/components/three/ServiceSceneLazy';
 import { Button } from '@/components/ui/Button';
 import { Container, Section } from '@/components/ui/Container';
 import { PageHeader } from '@/components/ui/PageHeader';
@@ -32,11 +33,14 @@ export default async function ServiceDetailPage({ params }: { params: Promise<{ 
 
   return (
     <>
-      <PageHeader eyebrow="Service" title={service.title} subtitle={service.subtitle}>
-        <Button href="/contact" size="lg">
-          Get Free Consultation <ArrowRight size={18} />
-        </Button>
-      </PageHeader>
+      <div className="relative">
+        <ServiceSceneLazy slug={service.slug} />
+        <PageHeader eyebrow="Service" title={service.title} subtitle={service.subtitle}>
+          <Button href="/contact" size="lg">
+            Get Free Consultation <ArrowRight size={18} />
+          </Button>
+        </PageHeader>
+      </div>
 
       <Section>
         <Container>

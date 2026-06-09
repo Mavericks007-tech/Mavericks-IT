@@ -3,6 +3,7 @@
 import { motion } from 'framer-motion';
 import { Quote, Star } from 'lucide-react';
 
+import { MagneticTilt } from '@/components/effects/MagneticTilt';
 import { Container, Section } from '@/components/ui/Container';
 import type { Testimonial } from '@/lib/api';
 
@@ -34,23 +35,26 @@ export function TestimonialsSection({ testimonials = [] }: { testimonials?: Test
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: '-50px' }}
               transition={{ duration: 0.6, delay: i * 0.1 }}
-              className="glass rounded-2xl p-8 relative"
             >
-              <Quote className="absolute top-6 right-6 text-electric-cyan/20" size={48} />
-              <div className="flex gap-1 mb-4">
-                {Array.from({ length: t.rating || 5 }).map((_, idx) => (
-                  <Star key={idx} size={16} className="fill-electric-cyan text-electric-cyan" />
-                ))}
-              </div>
-              <p className="text-body-lg text-white leading-relaxed mb-6 relative z-10">
-                &ldquo;{t.content}&rdquo;
-              </p>
-              <div className="border-t border-white/10 pt-4">
-                <div className="font-display font-bold text-white">{t.name}</div>
-                <div className="text-sm text-soft-gray">
-                  {t.title}{t.company && `, ${t.company}`}
+              <MagneticTilt intensity={6} className="h-full">
+                <div className="glass rounded-2xl p-8 relative h-full">
+                  <Quote className="absolute top-6 right-6 text-electric-cyan/20" size={48} />
+                  <div className="flex gap-1 mb-4">
+                    {Array.from({ length: t.rating || 5 }).map((_, idx) => (
+                      <Star key={idx} size={16} className="fill-electric-cyan text-electric-cyan" />
+                    ))}
+                  </div>
+                  <p className="text-body-lg text-white leading-relaxed mb-6 relative z-10">
+                    &ldquo;{t.content}&rdquo;
+                  </p>
+                  <div className="border-t border-white/10 pt-4">
+                    <div className="font-display font-bold text-white">{t.name}</div>
+                    <div className="text-sm text-soft-gray">
+                      {t.title}{t.company && `, ${t.company}`}
+                    </div>
+                  </div>
                 </div>
-              </div>
+              </MagneticTilt>
             </motion.div>
           ))}
         </div>

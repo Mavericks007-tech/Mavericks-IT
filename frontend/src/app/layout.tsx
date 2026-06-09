@@ -2,8 +2,12 @@ import type { Metadata, Viewport } from 'next';
 
 import { Footer } from '@/components/layout/Footer';
 import { Navbar } from '@/components/layout/Navbar';
+import { CursorTrail } from '@/components/effects/CursorTrail';
+import { LoadingScreen } from '@/components/effects/LoadingScreen';
 import { MagneticCursor } from '@/components/effects/MagneticCursor';
+import { PageTransition } from '@/components/effects/PageTransition';
 import { SmoothScroll } from '@/components/effects/SmoothScroll';
+import { ChromeWrapper } from '@/components/layout/ChromeWrapper';
 import { fetchSeo, fetchSite } from '@/lib/api';
 
 import './globals.css';
@@ -82,11 +86,15 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         ))}
       </head>
       <body className="bg-deep-space text-white font-body antialiased">
+        <LoadingScreen />
         <MagneticCursor />
+        <CursorTrail />
         <SmoothScroll>
-          <Navbar />
-          <main>{children}</main>
-          <Footer />
+          <ChromeWrapper navbar={<Navbar />} footer={<Footer />}>
+            <PageTransition>
+              {children}
+            </PageTransition>
+          </ChromeWrapper>
         </SmoothScroll>
       </body>
     </html>

@@ -4,6 +4,7 @@ import dynamic from 'next/dynamic';
 import { motion } from 'framer-motion';
 import { ArrowRight } from 'lucide-react';
 
+import { AnimatedCounter } from '@/components/effects/AnimatedCounter';
 import { Button } from '@/components/ui/Button';
 import { Container } from '@/components/ui/Container';
 import type { HeroData, TrustStat } from '@/lib/api';
@@ -102,7 +103,7 @@ export function HeroSection({ hero, trustStats = [] }: Props) {
             {trustStats.map((stat) => (
               <div key={stat.id} className="glass rounded-2xl p-6 text-center">
                 <div className="text-3xl md:text-4xl font-display font-bold text-gradient mb-2">
-                  {stat.value}
+                  <AnimatedCounter to={stat.numeric_value} suffix={stat.suffix || ''} />
                 </div>
                 <div className="text-sm text-soft-gray">{stat.label}</div>
               </div>
