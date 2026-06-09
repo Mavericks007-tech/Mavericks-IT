@@ -1,0 +1,95 @@
+# Dev compose — hot-reload, console email, Postgres + Redis + Celery.
+# For prod use docker-compose.prod.yml.
+version: '3.9'
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      TZ: Asia/Dhaka
+      PGTZ: Asia/Dhaka
+      POSTGRES_DB: ${DB_NAME:-mavericks_tech}
+      POSTGRES_USER: ${DB_USER:-mavericks}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-mavericks}
+    ports: ["5432:5432"]
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-mavericks}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    command: redis-server --appendonly yes
+    ports: ["6379:6379"]
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+
+  backend:
+    build: ./backend
+    command: python manage.py runserver 0.0.0.0:8000
+    env_file: .env
+    environment:
+      DEBUG: "True"
+      DB_HOST: postgres
+      REDIS_URL: redis://redis:6379/1
+      CELERY_BROKER_URL: redis://redis:6379/0
+      CELERY_RESULT_BACKEND: redis://redis:6379/0
+    volumes:
+      - ./backend:/app
+      - media_data:/app/media
+    ports: ["8000:8000"]
+    depends_on:
+      postgres: {condition: service_healthy}
+      redis:    {condition: service_healthy}
+
+  celery_worker:
+    build: ./backend
+    command: celery -A backend_config worker -l info
+    env_file: .env
+    environment:
+      DB_HOST: postgres
+      REDIS_URL: redis://redis:6379/1
+      CELERY_BROKER_URL: redis://redis:6379/0
+      CELERY_RESULT_BACKEND: redis://redis:6379/0
+    volumes:
+      - ./backend:/app
+      - media_data:/app/media
+    depends_on: [backend, redis]
+
+  celery_beat:
+    build: ./backend
+    command: celery -A backend_config beat -l info
+    env_file: .env
+    environment:
+      DB_HOST: postgres
+      REDIS_URL: redis://redis:6379/1
+      CELERY_BROKER_URL: redis://redis:6379/0
+    volumes:
+      - ./backend:/app
+    depends_on: [backend, redis]
+
+  frontend:
+    build: ./frontend
+    command: npm run dev
+    environment:
+      TZ: Asia/Dhaka
+      NEXT_PUBLIC_API_URL: http://localhost:8000/api/v1
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+      - /app/.next
+    ports: ["3000:3000"]
+    depends_on: [backend]
+
+volumes:
+  postgres_data:
+  redis_data:
+  media_data:
