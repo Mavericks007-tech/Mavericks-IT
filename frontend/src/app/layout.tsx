@@ -10,6 +10,8 @@ import { PageTransition } from '@/components/effects/PageTransition';
 import { ServiceWorkerRegister } from '@/components/effects/ServiceWorkerRegister';
 import { SmoothScroll } from '@/components/effects/SmoothScroll';
 import { ChromeWrapper } from '@/components/layout/ChromeWrapper';
+import { ToastProvider } from '@/components/ui/Toast';
+import { ToastBridge } from '@/components/ui/ToastBridge';
 import { fetchSeo, fetchSite } from '@/lib/api';
 
 import './globals.css';
@@ -112,17 +114,20 @@ export default async function RootLayout({ children }: { children: React.ReactNo
       </head>
       <body className="bg-deep-space text-white font-body antialiased">
         <GtmNoscript gtm={a?.google_tag_manager_id || undefined} />
-        <LoadingScreen />
-        <MagneticCursor />
-        <CursorTrail />
-        <SmoothScroll>
-          <ChromeWrapper navbar={<Navbar />} footer={<Footer />}>
-            <PageTransition>
-              {children}
-            </PageTransition>
-          </ChromeWrapper>
-        </SmoothScroll>
-        <ServiceWorkerRegister />
+        <ToastProvider>
+          <ToastBridge />
+          <LoadingScreen />
+          <MagneticCursor />
+          <CursorTrail />
+          <SmoothScroll>
+            <ChromeWrapper navbar={<Navbar />} footer={<Footer />}>
+              <PageTransition>
+                {children}
+              </PageTransition>
+            </ChromeWrapper>
+          </SmoothScroll>
+          <ServiceWorkerRegister />
+        </ToastProvider>
       </body>
     </html>
   );

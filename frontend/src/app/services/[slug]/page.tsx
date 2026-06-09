@@ -1,8 +1,10 @@
 import { ArrowRight } from 'lucide-react';
+import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import type { Metadata } from 'next';
 
 import { ServiceSceneLazy } from '@/components/three/ServiceSceneLazy';
+import { Breadcrumb } from '@/components/ui/Breadcrumb';
 import { Button } from '@/components/ui/Button';
 import { Container, Section } from '@/components/ui/Container';
 import { PageHeader } from '@/components/ui/PageHeader';
@@ -31,6 +33,9 @@ export default async function ServiceDetailPage({ params }: { params: Promise<{ 
   const service = await api.service(slug);
   if (!service) notFound();
 
+  const all = (await api.services())?.results ?? [];
+  const related = all.filter((s) => s.slug !== slug).slice(0, 4);
+
   return (
     <>
       <div className="relative">
@@ -40,6 +45,17 @@ export default async function ServiceDetailPage({ params }: { params: Promise<{ 
             Get Free Consultation <ArrowRight size={18} />
           </Button>
         </PageHeader>
+        <Container>
+          <div className="-mt-6 mb-2">
+            <Breadcrumb
+              items={[
+                { label: 'Home', href: '/' },
+                { label: 'Services', href: '/services' },
+                { label: service.title },
+              ]}
+            />
+          </div>
+        </Container>
       </div>
 
       <Section>
@@ -80,6 +96,28 @@ export default async function ServiceDetailPage({ params }: { params: Promise<{ 
           </div>
         </Container>
       </Section>
+
+      {related.length > 0 && (
+        <Section className="pt-0">
+          <Container>
+            <h2 className="font-display text-h3 text-white mb-6">Related services</h2>
+            <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
+              {related.map((s) => (
+                <Link
+                  key={s.slug}
+                  href={`/services/${s.slug}`}
+                  className="group glass rounded-xl p-5 hover:shadow-glow-cyan transition-all"
+                >
+                  <h3 className="font-display text-base font-bold text-white group-hover:text-electric-cyan transition-colors">
+                    {s.title}
+                  </h3>
+                  <p className="text-soft-gray text-xs mt-2 line-clamp-2">{s.subtitle}</p>
+                </Link>
+              ))}
+            </div>
+          </Container>
+        </Section>
+      )}
     </>
   );
 }

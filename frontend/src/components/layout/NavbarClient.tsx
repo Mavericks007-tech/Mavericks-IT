@@ -5,6 +5,7 @@ import { Menu, X } from 'lucide-react';
 import { useEffect, useState } from 'react';
 
 import { Logo } from '@/components/brand/Logo';
+import { GlobalSearch } from '@/components/search/GlobalSearch';
 import { Button } from '@/components/ui/Button';
 import { Container } from '@/components/ui/Container';
 import type { NavItem } from '@/lib/api';
@@ -67,7 +68,8 @@ export function NavbarClient({ navItems, siteName, logoUrl }: Props) {
               ))}
             </ul>
 
-            <div className="hidden lg:block">
+            <div className="hidden lg:flex items-center gap-3">
+              <GlobalSearch />
               <Button href="/contact" size="sm">
                 Get Free Consultation →
               </Button>

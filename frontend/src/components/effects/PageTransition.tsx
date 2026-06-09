@@ -3,15 +3,18 @@
 import { AnimatePresence, motion } from 'framer-motion';
 import { usePathname } from 'next/navigation';
 
+import { useReducedMotion } from '@/hooks/useReducedMotion';
+
 /**
  * Fade + slight Y-slide between routes.
- * Disabled on /manage/* (admin should feel instant, not theatrical).
+ * Disabled on /manage/* (admin should feel instant) and under prefers-reduced-motion.
  */
 export function PageTransition({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const isAdmin = pathname?.startsWith('/manage');
+  const reduced = useReducedMotion();
 
-  if (isAdmin) return <>{children}</>;
+  if (isAdmin || reduced) return <>{children}</>;
 
   return (
     <AnimatePresence mode="wait" initial={false}>

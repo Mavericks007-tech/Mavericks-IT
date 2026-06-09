@@ -8,8 +8,10 @@ import { Button } from '@/components/ui/Button';
 import { Container, Section } from '@/components/ui/Container';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { api, type Industry, type Service } from '@/lib/api';
+import { useToast } from '@/components/ui/Toast';
 
 const STEPS = ['About', 'Requirements', 'Contact', 'Review'];
+const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 export default function GetQuotePage() {
   const [step, setStep] = useState(0);
@@ -34,7 +36,21 @@ export default function GetQuotePage() {
     api.industries().then((d) => setIndustries(d?.results ?? []));
   }, []);
 
+  const toast = useToast();
+
+  function validateAll(): string | null {
+    if (!form.project_type) return 'Pick a project type on step 1.';
+    if (!form.full_name.trim() || form.full_name.trim().length < 2) return 'Name must be at least 2 characters.';
+    if (!form.email.trim() || !EMAIL_RE.test(form.email)) return 'Enter a valid email.';
+    return null;
+  }
+
   const submit = async () => {
+    const err = validateAll();
+    if (err) {
+      toast.warning('Check your answers', err);
+      return;
+    }
     setStatus('submitting');
     try {
       const res = await api.submitLead({
@@ -46,9 +62,16 @@ export default function GetQuotePage() {
         service_interest: form.service_interest,
         notes: `Project: ${form.project_type}\nBudget: ${form.budget_min}\nTimeline: ${form.timeline}\n\n${form.description}`,
       });
-      setStatus(res.ok ? 'success' : 'error');
-    } catch {
+      if (res.ok) {
+        setStatus('success');
+        toast.success('Quote request sent', 'Detailed quote within 24 hours.');
+      } else {
+        setStatus('error');
+        toast.error('Could not send', 'Please try again or email us directly.');
+      }
+    } catch (e) {
       setStatus('error');
+      toast.error('Network error', (e as Error).message);
     }
   };
 

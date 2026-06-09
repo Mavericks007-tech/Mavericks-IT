@@ -4,16 +4,24 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { useEffect, useState } from 'react';
 
 import { Logo } from '@/components/brand/Logo';
+import { useReducedMotion } from '@/hooks/useReducedMotion';
 
 /**
  * First-paint loading screen.
  * Shows for max 1.2s OR until window 'load' fires. Then morphs out.
+ * Skipped entirely under prefers-reduced-motion.
  */
 export function LoadingScreen() {
   const [visible, setVisible] = useState(true);
+  const reduced = useReducedMotion();
 
   useEffect(() => {
     if (typeof window === 'undefined') return;
+
+    if (reduced) {
+      setVisible(false);
+      return;
+    }
 
     // Skip on hot reload (page already loaded)
     if (document.readyState === 'complete') {

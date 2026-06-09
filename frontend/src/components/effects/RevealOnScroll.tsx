@@ -3,6 +3,8 @@
 import { motion, type Variants } from 'framer-motion';
 import { ReactNode } from 'react';
 
+import { useReducedMotion } from '@/hooks/useReducedMotion';
+
 interface Props {
   children: ReactNode;
   delay?: number;
@@ -18,6 +20,8 @@ const variants: Variants = {
 };
 
 export function RevealOnScroll({ children, delay = 0, y = 30, duration = 0.6, className, once = true }: Props) {
+  const reduced = useReducedMotion();
+  if (reduced) return <div className={className}>{children}</div>;
   return (
     <motion.div
       variants={variants}

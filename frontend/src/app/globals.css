@@ -140,3 +140,11 @@ h1, h2, h3, h4, h5, h6 {
 html.lenis, html.lenis body { height: auto; }
 .lenis.lenis-smooth { scroll-behavior: auto !important; }
 .lenis.lenis-stopped { overflow: hidden; }
+
+@keyframes shimmer {
+  100% { transform: translateX(100%); }
+}
+@keyframes slideIn {
+  0%   { opacity: 0; transform: translateX(8px); }
+  100% { opacity: 1; transform: translateX(0); }
+}

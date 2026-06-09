@@ -8,26 +8,67 @@ import { Button } from '@/components/ui/Button';
 import { Container, Section } from '@/components/ui/Container';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { api, type SiteSettings } from '@/lib/api';
+import { useToast } from '@/components/ui/Toast';
+
+const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+type Form = { full_name: string; email: string; phone: string; company_name: string; industry: string; notes: string };
+type Errors = Partial<Record<keyof Form, string>>;
+
+function validate(f: Form): Errors {
+  const e: Errors = {};
+  if (!f.full_name.trim() || f.full_name.trim().length < 2) e.full_name = 'Name must be at least 2 characters.';
+  if (!f.email.trim()) e.email = 'Email is required.';
+  else if (!EMAIL_RE.test(f.email)) e.email = 'Enter a valid email.';
+  if (f.phone && f.phone.replace(/[^0-9]/g, '').length < 6) e.phone = 'Phone looks too short.';
+  return e;
+}
 
 export default function ContactPage() {
   const [settings, setSettings] = useState<SiteSettings | null>(null);
-  const [form, setForm] = useState({
+  const [form, setForm] = useState<Form>({
     full_name: '', email: '', phone: '', company_name: '', industry: '', notes: '',
   });
+  const [errors, setErrors] = useState<Errors>({});
+  const [touched, setTouched] = useState<Partial<Record<keyof Form, boolean>>>({});
   const [status, setStatus] = useState<'idle' | 'submitting' | 'success' | 'error'>('idle');
+  const toast = useToast();
 
   useEffect(() => {
     api.site().then((d) => setSettings(d?.settings ?? null));
   }, []);
 
+  const setField = (k: keyof Form) => (v: string) => {
+    setForm((f) => ({ ...f, [k]: v }));
+    if (touched[k]) setErrors(validate({ ...form, [k]: v }));
+  };
+  const touch = (k: keyof Form) => () => {
+    setTouched((t) => ({ ...t, [k]: true }));
+    setErrors(validate(form));
+  };
+
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
+    const errs = validate(form);
+    setErrors(errs);
+    setTouched({ full_name: true, email: true, phone: true });
+    if (Object.keys(errs).length > 0) {
+      toast.warning('Check the form', 'Some fields need attention.');
+      return;
+    }
     setStatus('submitting');
     try {
       const res = await api.submitLead(form);
-      setStatus(res.ok ? 'success' : 'error');
-    } catch {
+      if (res.ok) {
+        setStatus('success');
+        toast.success('Message sent', "We'll reply within 4 business hours.");
+      } else {
+        setStatus('error');
+        toast.error('Could not send', 'Please try again or email us directly.');
+      }
+    } catch (err) {
       setStatus('error');
+      toast.error('Network error', (err as Error).message);
     }
   };
 
@@ -116,11 +157,11 @@ export default function ContactPage() {
                   <h2 className="font-display text-h3 text-white mb-2">Send Us A Message</h2>
                   <p className="text-soft-gray text-sm mb-6">All fields needed except phone & notes.</p>
 
-                  <Input label="Your Name *" value={form.full_name} onChange={(v) => setForm({ ...form, full_name: v })} required />
-                  <Input label="Email *" type="email" value={form.email} onChange={(v) => setForm({ ...form, email: v })} required />
-                  <Input label="Phone (WhatsApp preferred)" value={form.phone} onChange={(v) => setForm({ ...form, phone: v })} />
-                  <Input label="Company" value={form.company_name} onChange={(v) => setForm({ ...form, company_name: v })} />
-                  <Input label="Industry" value={form.industry} onChange={(v) => setForm({ ...form, industry: v })} />
+                  <Input label="Your Name *" value={form.full_name} onChange={setField('full_name')} onBlur={touch('full_name')} required error={errors.full_name} />
+                  <Input label="Email *" type="email" value={form.email} onChange={setField('email')} onBlur={touch('email')} required error={errors.email} />
+                  <Input label="Phone (WhatsApp preferred)" value={form.phone} onChange={setField('phone')} onBlur={touch('phone')} error={errors.phone} />
+                  <Input label="Company" value={form.company_name} onChange={setField('company_name')} />
+                  <Input label="Industry" value={form.industry} onChange={setField('industry')} />
 
                   <div>
                     <label className="block text-xs font-mono uppercase tracking-widest text-soft-gray mb-1.5">
@@ -153,9 +194,15 @@ export default function ContactPage() {
 }
 
 function Input({
-  label, value, onChange, type = 'text', required,
+  label, value, onChange, onBlur, type = 'text', required, error,
 }: {
-  label: string; value: string; onChange: (v: string) => void; type?: string; required?: boolean;
+  label: string;
+  value: string;
+  onChange: (v: string) => void;
+  onBlur?: () => void;
+  type?: string;
+  required?: boolean;
+  error?: string;
 }) {
   return (
     <div>
@@ -165,8 +212,15 @@ function Input({
         required={required}
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-white placeholder:text-soft-gray/50 focus:outline-none focus:border-electric-cyan focus:shadow-glow-cyan transition-all"
+        onBlur={onBlur}
+        aria-invalid={Boolean(error)}
+        className={`w-full bg-white/5 border rounded-lg px-4 py-3 text-white placeholder:text-soft-gray/50 focus:outline-none transition-all ${
+          error
+            ? 'border-crimson-red focus:border-crimson-red'
+            : 'border-white/10 focus:border-electric-cyan focus:shadow-glow-cyan'
+        }`}
       />
+      {error && <p role="alert" className="text-crimson-red text-xs mt-1">{error}</p>}
     </div>
   );
 }
