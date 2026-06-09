@@ -129,3 +129,56 @@ export const manage = {
   runCampaign: (id: string) =>
     manageFetch(`/comms/campaigns/${id}/run/`, { method: 'POST' }),
 };
+
+
+// ---------------------------------------------------------------------------
+// Generic CMS admin client
+// /api/v1/cms/admin/<resource>/  (DRF DefaultRouter — paginated list, CRUD)
+// ---------------------------------------------------------------------------
+export type CmsResource =
+  | 'hero-sections' | 'services' | 'testimonials' | 'trust-stats'
+  | 'industries' | 'case-studies' | 'differentiators' | 'process-steps'
+  | 'blog-posts' | 'cta-sections'
+  | 'pages' | 'media' | 'redirects' | 'site-settings'
+  | 'nav-menus' | 'nav-items' | 'footer-columns' | 'footer-links'
+  | 'meta-tags' | 'schemas'
+  | 'email-settings' | 'email-templates'
+  | 'users' | 'groups';
+
+export interface DRFPage<T> {
+  count: number;
+  next: string | null;
+  previous: string | null;
+  results: T[];
+}
+
+export const cmsAdmin = {
+  list: <T = Record<string, unknown>>(resource: CmsResource, qs = '') =>
+    manageFetch<DRFPage<T> | T[]>(`/cms/admin/${resource}/${qs}`),
+  get: <T = Record<string, unknown>>(resource: CmsResource, id: string | number) =>
+    manageFetch<T>(`/cms/admin/${resource}/${id}/`),
+  create: <T = Record<string, unknown>>(resource: CmsResource, data: Record<string, unknown>) =>
+    manageFetch<T>(`/cms/admin/${resource}/`, { method: 'POST', body: JSON.stringify(data) }),
+  update: <T = Record<string, unknown>>(resource: CmsResource, id: string | number, data: Record<string, unknown>) =>
+    manageFetch<T>(`/cms/admin/${resource}/${id}/`, { method: 'PATCH', body: JSON.stringify(data) }),
+  remove: (resource: CmsResource, id: string | number) =>
+    manageFetch(`/cms/admin/${resource}/${id}/`, { method: 'DELETE' }),
+  singleton: <T = Record<string, unknown>>(resource: 'site-settings' | 'email-settings') =>
+    manageFetch<T>(`/cms/admin/${resource}/singleton/`),
+  updateSingleton: <T = Record<string, unknown>>(resource: 'site-settings' | 'email-settings', data: Record<string, unknown>) =>
+    manageFetch<T>(`/cms/admin/${resource}/singleton/`, { method: 'PATCH', body: JSON.stringify(data) }),
+  uploadMedia: async (file: File, extra: Record<string, string> = {}) => {
+    const csrf = getCookie('csrftoken') || '';
+    const fd = new FormData();
+    fd.append('file', file);
+    for (const [k, v] of Object.entries(extra)) fd.append(k, v);
+    const res = await fetch(`${API_BASE}/cms/admin/media/`, {
+      method: 'POST',
+      credentials: 'include',
+      headers: { 'X-CSRFToken': csrf },
+      body: fd,
+    });
+    if (!res.ok) throw new Error(`Upload ${res.status}: ${await res.text()}`);
+    return res.json();
+  },
+};

@@ -3,6 +3,7 @@
 import {
   LayoutDashboard, Users, Briefcase, FileText, Receipt,
   Mail, BarChart3, Settings, LogOut, Menu, X, Building2, History,
+  Image as ImageIcon, Globe, Newspaper, Star, Megaphone, FileCode,
 } from 'lucide-react';
 import { usePathname, useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
@@ -11,17 +12,36 @@ import { Logo } from '@/components/brand/Logo';
 import { cn } from '@/lib/cn';
 import { manage, type AdminUser } from '@/lib/manage-api';
 
-const NAV = [
+const NAV: { href?: string; label?: string; icon?: typeof LayoutDashboard; group?: string }[] = [
   { href: '/manage/dashboard', label: 'Dashboard', icon: LayoutDashboard },
-  { href: '/manage/leads', label: 'Leads', icon: Users },
-  { href: '/manage/clients', label: 'Clients', icon: Building2 },
+
+  { group: 'CRM' },
+  { href: '/manage/leads',    label: 'Leads',    icon: Users },
+  { href: '/manage/clients',  label: 'Clients',  icon: Building2 },
   { href: '/manage/projects', label: 'Projects', icon: Briefcase },
-  { href: '/manage/quotes', label: 'Quotes', icon: FileText },
+  { href: '/manage/quotes',   label: 'Quotes',   icon: FileText },
   { href: '/manage/invoices', label: 'Invoices', icon: Receipt },
-  { href: '/manage/email', label: 'Email', icon: Mail },
+
+  { group: 'CMS' },
+  { href: '/manage/cms-services',    label: 'Services',     icon: FileCode },
+  { href: '/manage/cms-industries',  label: 'Industries',   icon: Globe },
+  { href: '/manage/cms-pages',       label: 'Pages',        icon: FileText },
+  { href: '/manage/cms-blog',        label: 'Blog',         icon: Newspaper },
+  { href: '/manage/cms-testimonials', label: 'Testimonials', icon: Star },
+  { href: '/manage/cms-case-studies', label: 'Case Studies', icon: Briefcase },
+  { href: '/manage/cms-media',       label: 'Media',        icon: ImageIcon },
+  { href: '/manage/cms-meta',        label: 'SEO',          icon: Megaphone },
+
+  { group: 'Comms' },
+  { href: '/manage/email',   label: 'Email',   icon: Mail },
+
+  { group: 'Reports' },
   { href: '/manage/reports', label: 'Reports', icon: BarChart3 },
-  { href: '/manage/audit', label: 'Audit Log', icon: History },
-  { href: '/manage/settings', label: 'Settings', icon: Settings },
+  { href: '/manage/audit',   label: 'Audit',   icon: History },
+
+  { group: 'Admin' },
+  { href: '/manage/cms-users',  label: 'Users & Roles', icon: Users },
+  { href: '/manage/settings',   label: 'Settings',      icon: Settings },
 ];
 
 export function ManageShell({ children }: { children: React.ReactNode }) {
@@ -101,7 +121,15 @@ function SidebarBody({ user, pathname, onLogout, onNav }: {
       </div>
 
       <nav className="flex-1 overflow-y-auto p-4 space-y-1">
-        {NAV.map((item) => {
+        {NAV.map((item, idx) => {
+          if (item.group) {
+            return (
+              <p key={`g-${idx}`} className="px-3 pt-4 pb-1 text-[10px] uppercase tracking-widest text-soft-gray/60 font-semibold">
+                {item.group}
+              </p>
+            );
+          }
+          if (!item.href || !item.icon) return null;
           const Icon = item.icon;
           const active = pathname === item.href || pathname.startsWith(item.href + '/');
           return (
@@ -110,7 +138,7 @@ function SidebarBody({ user, pathname, onLogout, onNav }: {
               href={item.href}
               onClick={onNav}
               className={cn(
-                'flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all',
+                'flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-all',
                 active
                   ? 'bg-electric-cyan/15 text-electric-cyan'
                   : 'text-soft-gray hover:text-white hover:bg-white/5',
