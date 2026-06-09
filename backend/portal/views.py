@@ -1,13 +1,17 @@
 """Client-facing portal endpoints. Scoped to the authenticated Contact's Client."""
-from rest_framework import permissions, viewsets
-from rest_framework.decorators import api_view, authentication_classes, permission_classes
+from django.http import HttpResponse
+from django.utils import timezone
+from rest_framework import permissions, status, viewsets
+from rest_framework.decorators import action, api_view, authentication_classes, permission_classes
+from rest_framework.parsers import FormParser, MultiPartParser
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 
-from crm.models import Invoice, Milestone, Payment, Project, Quote
+from crm.models import Invoice, Milestone, Payment, Project, ProjectFile, Quote
+from crm.pdf import render_invoice_pdf, render_quote_pdf
 from crm.serializers import (
     InvoiceSerializer, MilestoneSerializer, PaymentSerializer,
-    ProjectSerializer, QuoteSerializer,
+    ProjectFileSerializer, ProjectSerializer, QuoteSerializer,
 )
 
 from .auth import PortalContact, PortalTokenAuthentication
@@ -36,10 +40,94 @@ class PortalInvoiceViewSet(PortalViewSet):
     queryset = Invoice.objects.all().prefetch_related('line_items', 'payments')
     serializer_class = InvoiceSerializer
 
+    @action(detail=True, methods=['get'], url_path='pdf')
+    def pdf(self, request, pk=None):
+        invoice = self.get_object()
+        body = render_invoice_pdf(invoice)
+        resp = HttpResponse(body, content_type='application/pdf')
+        resp['Content-Disposition'] = f'attachment; filename="Invoice-{invoice.number}.pdf"'
+        return resp
+
+    @action(detail=True, methods=['post'], url_path='record-payment')
+    def record_payment(self, request, pk=None):
+        """Client records a payment they just made (pending verification)."""
+        invoice = self.get_object()
+        amount = request.data.get('amount')
+        method = request.data.get('method') or 'bkash'
+        reference = request.data.get('reference', '')
+        if not amount:
+            return Response({'detail': 'amount required'}, status=400)
+        payment = Payment.objects.create(
+            invoice=invoice,
+            amount=amount,
+            method=method,
+            reference=reference,
+            verified=False,
+            notes=f'Self-reported via portal by {request.user.contact.full_name}',
+            paid_at=timezone.now(),
+        )
+        invoice.recalculate()
+        return Response(PaymentSerializer(payment).data, status=201)
+
 
 class PortalQuoteViewSet(PortalViewSet):
     queryset = Quote.objects.all().prefetch_related('line_items')
     serializer_class = QuoteSerializer
+
+    @action(detail=True, methods=['get'], url_path='pdf')
+    def pdf(self, request, pk=None):
+        quote = self.get_object()
+        body = render_quote_pdf(quote)
+        resp = HttpResponse(body, content_type='application/pdf')
+        resp['Content-Disposition'] = f'attachment; filename="Quote-{quote.number}.pdf"'
+        return resp
+
+    @action(detail=True, methods=['post'], url_path='accept')
+    def accept(self, request, pk=None):
+        """Client accepts a quote via signature text + timestamp."""
+        quote = self.get_object()
+        if quote.status == 'accepted':
+            return Response({'detail': 'already accepted'}, status=400)
+        signature = (request.data.get('signature') or '').strip()
+        if len(signature) < 2:
+            return Response({'detail': 'signature required (full name)'}, status=400)
+
+        quote.status = 'accepted'
+        quote.accepted_at = timezone.now()
+        # Store the typed signature in cover_letter footer for audit
+        ack = (
+            f'\n\n--- Accepted on {quote.accepted_at:%Y-%m-%d %H:%M %Z} '
+            f'by {signature} (portal) ---'
+        )
+        if quote.cover_letter is None:
+            quote.cover_letter = ack
+        else:
+            quote.cover_letter = (quote.cover_letter or '') + ack
+        quote.save()
+        return Response(QuoteSerializer(quote).data)
+
+
+# ---------------------------------------------------------------------------
+# Portal project-file upload (client → agency)
+# ---------------------------------------------------------------------------
+class PortalProjectFileViewSet(viewsets.ModelViewSet):
+    """Client can list + upload files. Server forces source=client."""
+    serializer_class = ProjectFileSerializer
+    authentication_classes = [PortalTokenAuthentication]
+    permission_classes = [IsPortalContact]
+    parser_classes = [MultiPartParser, FormParser]
+    filterset_fields = ['project']
+    http_method_names = ['get', 'post', 'delete', 'head', 'options']
+
+    def get_queryset(self):
+        return ProjectFile.objects.filter(project__client=self.request.user.client)
+
+    def perform_create(self, serializer):
+        # Ensure project belongs to this client
+        project = serializer.validated_data.get('project')
+        if project and project.client_id != self.request.user.client.id:
+            raise PermissionError('Project does not belong to your client.')
+        serializer.save(source='client')
 
 
 class PortalMilestoneViewSet(viewsets.ReadOnlyModelViewSet):

@@ -30,3 +30,6 @@ python-json-logger>=2.0
 
 # --- security helpers ---
 argon2-cffi>=23.0
+
+# --- PDF generation ---
+reportlab>=4.0

@@ -54,18 +54,30 @@ export default function PortalDashboard() {
             <Stat label="Total Billed" value={`৳${me.summary.total_billed.toLocaleString()}`} icon={<Receipt size={20} />} />
           </div>
 
-          <div className="grid sm:grid-cols-2 gap-6">
-            <a href="/portal/projects" className="group glass rounded-2xl p-8 hover:shadow-glow-cyan transition-all">
-              <Briefcase className="text-electric-cyan mb-4" size={32} />
-              <h3 className="font-display text-xl font-bold text-white mb-2">My Projects</h3>
-              <p className="text-soft-gray text-sm">Track progress, milestones, deliverables.</p>
-              <p className="text-3xl font-display font-bold text-gradient mt-4">{me.summary.projects}</p>
+          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            <a href="/portal/projects" className="group glass rounded-2xl p-6 hover:shadow-glow-cyan transition-all">
+              <Briefcase className="text-electric-cyan mb-4" size={28} />
+              <h3 className="font-display text-lg font-bold text-white mb-1">Projects</h3>
+              <p className="text-soft-gray text-xs">Progress + milestones.</p>
+              <p className="text-2xl font-display font-bold text-gradient mt-3">{me.summary.projects}</p>
             </a>
-            <a href="/portal/invoices" className="group glass rounded-2xl p-8 hover:shadow-glow-cyan transition-all">
-              <Receipt className="text-electric-cyan mb-4" size={32} />
-              <h3 className="font-display text-xl font-bold text-white mb-2">Invoices & Payments</h3>
-              <p className="text-soft-gray text-sm">View bills, payments, balance.</p>
-              <p className="text-3xl font-display font-bold text-gradient mt-4">{me.summary.invoices}</p>
+            <a href="/portal/invoices" className="group glass rounded-2xl p-6 hover:shadow-glow-cyan transition-all">
+              <Receipt className="text-electric-cyan mb-4" size={28} />
+              <h3 className="font-display text-lg font-bold text-white mb-1">Invoices</h3>
+              <p className="text-soft-gray text-xs">Bills, balances, record paid.</p>
+              <p className="text-2xl font-display font-bold text-gradient mt-3">{me.summary.invoices}</p>
+            </a>
+            <a href="/portal/quotes" className="group glass rounded-2xl p-6 hover:shadow-glow-cyan transition-all">
+              <FileText className="text-electric-cyan mb-4" size={28} />
+              <h3 className="font-display text-lg font-bold text-white mb-1">Quotes</h3>
+              <p className="text-soft-gray text-xs">Review and accept.</p>
+              <p className="text-2xl font-display font-bold text-gradient mt-3">{me.summary.open_quotes}</p>
+            </a>
+            <a href="/portal/files" className="group glass rounded-2xl p-6 hover:shadow-glow-cyan transition-all">
+              <Briefcase className="text-electric-cyan mb-4" size={28} />
+              <h3 className="font-display text-lg font-bold text-white mb-1">Files</h3>
+              <p className="text-soft-gray text-xs">Project documents.</p>
+              <p className="text-2xl font-display font-bold text-gradient mt-3">—</p>
             </a>
           </div>
         </Container>

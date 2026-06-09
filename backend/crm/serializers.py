@@ -1,8 +1,8 @@
 from rest_framework import serializers
 
 from .models import (
-    Activity, Client, Contact, Invoice, InvoiceLineItem, Lead,
-    Milestone, Note, Payment, Project, Quote, QuoteLineItem, Task,
+    Activity, Client, Comment, Contact, Invoice, InvoiceLineItem, Lead,
+    Milestone, Note, Payment, Project, ProjectFile, Quote, QuoteLineItem, Task,
 )
 
 
@@ -239,3 +239,45 @@ class NoteSerializer(serializers.ModelSerializer):
             'created_at', 'updated_at',
         ]
         read_only_fields = ['id', 'created_at', 'updated_at']
+
+
+class ProjectFileSerializer(serializers.ModelSerializer):
+    file_url = serializers.SerializerMethodField()
+    uploaded_by_name = serializers.CharField(source='uploaded_by.username', read_only=True)
+
+    class Meta:
+        model = ProjectFile
+        fields = [
+            'id', 'project', 'file', 'file_url', 'filename',
+            'size_bytes', 'content_type', 'source',
+            'uploaded_by', 'uploaded_by_name', 'note',
+            'created_at',
+        ]
+        read_only_fields = ['id', 'filename', 'size_bytes', 'created_at', 'uploaded_by_name']
+
+    def get_file_url(self, obj):
+        try:
+            request = self.context.get('request')
+            url = obj.file.url
+            return request.build_absolute_uri(url) if request else url
+        except Exception:
+            return ''
+
+
+class CommentSerializer(serializers.ModelSerializer):
+    author_name = serializers.CharField(source='author.username', read_only=True)
+    mentions = serializers.PrimaryKeyRelatedField(many=True, queryset=Comment._meta.get_field('mentions').related_model.objects.all(), required=False)
+    mention_names = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Comment
+        fields = [
+            'id', 'body',
+            'lead', 'client', 'project', 'quote', 'invoice',
+            'author', 'author_name', 'mentions', 'mention_names',
+            'created_at', 'updated_at',
+        ]
+        read_only_fields = ['id', 'created_at', 'updated_at', 'author_name', 'mention_names']
+
+    def get_mention_names(self, obj):
+        return list(obj.mentions.values_list('username', flat=True))

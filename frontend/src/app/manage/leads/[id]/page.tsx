@@ -3,7 +3,9 @@
 import { ArrowLeft, Mail, Phone, Building2, DollarSign, Calendar, UserCheck } from 'lucide-react';
 import { useEffect, useState, use } from 'react';
 
+import { CommentThread } from '@/components/manage/CommentThread';
 import { ManageShell } from '@/components/manage/Shell';
+import { Timeline } from '@/components/manage/Timeline';
 import { Button } from '@/components/ui/Button';
 import { manage } from '@/lib/manage-api';
 
@@ -160,6 +162,11 @@ export default function LeadDetailPage({ params }: { params: Promise<{ id: strin
           </div>
 
           {msg && <p className="text-sm text-electric-cyan">{msg}</p>}
+        </div>
+
+        <div className="lg:col-span-2 mt-8 grid lg:grid-cols-2 gap-6">
+          <Timeline scope={{ lead: id }} />
+          <CommentThread scope={{ lead: id }} />
         </div>
       </div>
     </ManageShell>

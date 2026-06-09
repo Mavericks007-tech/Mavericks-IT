@@ -603,3 +603,70 @@ class Note(BaseModel):
 
     def __str__(self):
         return self.body[:60]
+
+
+# ---------------------------------------------------------------------------
+# Project file uploads (agency↔client via portal)
+# ---------------------------------------------------------------------------
+class ProjectFile(BaseModel):
+    SOURCE_CHOICES = [
+        ('agency', 'From agency'),
+        ('client', 'From client'),
+    ]
+    project = models.ForeignKey(Project, on_delete=models.CASCADE, related_name='files')
+    file = models.FileField(upload_to='project-files/%Y/%m/')
+    filename = models.CharField(max_length=300)
+    size_bytes = models.BigIntegerField(default=0)
+    content_type = models.CharField(max_length=100, blank=True)
+    source = models.CharField(max_length=20, choices=SOURCE_CHOICES, default='agency')
+    uploaded_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL, on_delete=models.SET_NULL,
+        null=True, blank=True, related_name='uploaded_project_files',
+    )
+    note = models.CharField(max_length=300, blank=True)
+    history = HistoricalRecords()
+
+    class Meta:
+        db_table = 'crm_project_file'
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return f'{self.filename} ({self.project_id})'
+
+    def save(self, *args, **kwargs):
+        if self.file and not self.filename:
+            self.filename = self.file.name.rsplit('/', 1)[-1]
+        if self.file and not self.size_bytes:
+            try:
+                self.size_bytes = self.file.size
+            except (OSError, ValueError):
+                self.size_bytes = 0
+        super().save(*args, **kwargs)
+
+
+# ---------------------------------------------------------------------------
+# Internal comments + @mentions
+# ---------------------------------------------------------------------------
+class Comment(BaseModel):
+    body = models.TextField()
+    lead = models.ForeignKey(Lead, on_delete=models.CASCADE, null=True, blank=True, related_name='comments')
+    client = models.ForeignKey(Client, on_delete=models.CASCADE, null=True, blank=True, related_name='comments')
+    project = models.ForeignKey(Project, on_delete=models.CASCADE, null=True, blank=True, related_name='comments')
+    quote = models.ForeignKey(Quote, on_delete=models.CASCADE, null=True, blank=True, related_name='comments')
+    invoice = models.ForeignKey(Invoice, on_delete=models.CASCADE, null=True, blank=True, related_name='comments')
+
+    author = models.ForeignKey(
+        settings.AUTH_USER_MODEL, on_delete=models.SET_NULL,
+        null=True, blank=True, related_name='authored_comments',
+    )
+    mentions = models.ManyToManyField(
+        settings.AUTH_USER_MODEL, blank=True, related_name='mentioned_in_comments',
+    )
+    history = HistoricalRecords()
+
+    class Meta:
+        db_table = 'crm_comment'
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return self.body[:60]

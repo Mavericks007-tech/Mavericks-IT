@@ -110,14 +110,28 @@ export const manage = {
   projects: () => manageFetch('/crm/projects/'),
   project: (id: string) => manageFetch(`/crm/projects/${id}/`),
   projectsKanban: () => manageFetch('/crm/projects/kanban/'),
+  updateProject: (id: string, data: Record<string, unknown>) =>
+    manageFetch(`/crm/projects/${id}/`, { method: 'PATCH', body: JSON.stringify(data) }),
 
   quotes: () => manageFetch('/crm/quotes/'),
   quote: (id: string) => manageFetch(`/crm/quotes/${id}/`),
+  createQuote: (data: Record<string, unknown>) =>
+    manageFetch('/crm/quotes/', { method: 'POST', body: JSON.stringify(data) }),
+  updateQuote: (id: string, data: Record<string, unknown>) =>
+    manageFetch(`/crm/quotes/${id}/`, { method: 'PATCH', body: JSON.stringify(data) }),
+  deleteQuote: (id: string) =>
+    manageFetch(`/crm/quotes/${id}/`, { method: 'DELETE' }),
 
   invoices: () => manageFetch('/crm/invoices/'),
   invoice: (id: string) => manageFetch(`/crm/invoices/${id}/`),
   invoiceSummary: () => manageFetch('/crm/invoices/summary/'),
   overdueInvoices: () => manageFetch('/crm/invoices/overdue/'),
+  createInvoice: (data: Record<string, unknown>) =>
+    manageFetch('/crm/invoices/', { method: 'POST', body: JSON.stringify(data) }),
+  updateInvoice: (id: string, data: Record<string, unknown>) =>
+    manageFetch(`/crm/invoices/${id}/`, { method: 'PATCH', body: JSON.stringify(data) }),
+  deleteInvoice: (id: string) =>
+    manageFetch(`/crm/invoices/${id}/`, { method: 'DELETE' }),
 
   // Comms
   emailTemplates: () => manageFetch('/comms/templates/'),
@@ -128,6 +142,60 @@ export const manage = {
   campaigns: () => manageFetch('/comms/campaigns/'),
   runCampaign: (id: string) =>
     manageFetch(`/comms/campaigns/${id}/run/`, { method: 'POST' }),
+
+  // CRM P9 additions
+  leadBulk: (ids: string[], action: string, value?: unknown) =>
+    manageFetch('/crm/leads/bulk-action/', { method: 'POST', body: JSON.stringify({ ids, action, value }) }),
+  leadsExportUrl: () => `${API_BASE}/crm/leads/export.csv/`,
+  clientsExportUrl: () => `${API_BASE}/crm/clients/export.csv/`,
+  leadsImport: async (file: File) => {
+    const csrf = getCookie('csrftoken') || '';
+    const fd = new FormData(); fd.append('file', file);
+    const res = await fetch(`${API_BASE}/crm/leads/import-csv/`, { method: 'POST', credentials: 'include', headers: { 'X-CSRFToken': csrf }, body: fd });
+    if (!res.ok) throw new Error(`Import ${res.status}: ${await res.text()}`);
+    return res.json();
+  },
+  clientsImport: async (file: File) => {
+    const csrf = getCookie('csrftoken') || '';
+    const fd = new FormData(); fd.append('file', file);
+    const res = await fetch(`${API_BASE}/crm/clients/import-csv/`, { method: 'POST', credentials: 'include', headers: { 'X-CSRFToken': csrf }, body: fd });
+    if (!res.ok) throw new Error(`Import ${res.status}: ${await res.text()}`);
+    return res.json();
+  },
+
+  invoicePdfUrl: (id: string) => `${API_BASE}/crm/invoices/${id}/pdf/`,
+  quotePdfUrl:   (id: string) => `${API_BASE}/crm/quotes/${id}/pdf/`,
+  recordPayment: (invoiceId: string, body: Record<string, unknown>) =>
+    manageFetch(`/crm/invoices/${invoiceId}/record-payment/`, { method: 'POST', body: JSON.stringify(body) }),
+
+  timeline: (params: { lead?: string; client?: string; project?: string }) => {
+    const qs = new URLSearchParams(params as Record<string,string>).toString();
+    return manageFetch(`/crm/timeline/?${qs}`);
+  },
+
+  comments: (filters: Record<string,string> = {}) => {
+    const qs = new URLSearchParams(filters).toString();
+    return manageFetch(`/crm/comments/${qs ? `?${qs}` : ''}`);
+  },
+  postComment: (body: Record<string, unknown>) =>
+    manageFetch('/crm/comments/', { method: 'POST', body: JSON.stringify(body) }),
+  deleteComment: (id: string) =>
+    manageFetch(`/crm/comments/${id}/`, { method: 'DELETE' }),
+
+  projectFiles: (projectId?: string) => {
+    const qs = projectId ? `?project=${projectId}` : '';
+    return manageFetch(`/crm/files/${qs}`);
+  },
+  uploadProjectFile: async (projectId: string, file: File, note = '') => {
+    const csrf = getCookie('csrftoken') || '';
+    const fd = new FormData();
+    fd.append('project', projectId);
+    fd.append('file', file);
+    if (note) fd.append('note', note);
+    const res = await fetch(`${API_BASE}/crm/files/`, { method: 'POST', credentials: 'include', headers: { 'X-CSRFToken': csrf }, body: fd });
+    if (!res.ok) throw new Error(`Upload ${res.status}: ${await res.text()}`);
+    return res.json();
+  },
 };
 
 

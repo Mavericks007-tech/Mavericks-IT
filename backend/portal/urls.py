@@ -11,6 +11,7 @@ router.register('milestones', views.PortalMilestoneViewSet, basename='portal-mil
 router.register('invoices', views.PortalInvoiceViewSet, basename='portal-invoices')
 router.register('quotes', views.PortalQuoteViewSet, basename='portal-quotes')
 router.register('payments', views.PortalPaymentViewSet, basename='portal-payments')
+router.register('files', views.PortalProjectFileViewSet, basename='portal-files')
 
 urlpatterns = [
     path('me/', views.portal_me, name='me'),

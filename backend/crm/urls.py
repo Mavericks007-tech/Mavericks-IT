@@ -16,6 +16,9 @@ router.register('tasks', views.TaskViewSet)
 router.register('activities', views.ActivityViewSet)
 router.register('notes', views.NoteViewSet)
 router.register('public/leads', views.PublicLeadView, basename='public-leads')
+router.register('timeline', views.TimelineView, basename='timeline')
+router.register('files', views.ProjectFileViewSet, basename='project-files')
+router.register('comments', views.CommentViewSet, basename='comments')
 
 urlpatterns = [
     path('', include(router.urls)),
