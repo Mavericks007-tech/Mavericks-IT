@@ -15,6 +15,7 @@ urlpatterns = [
     path('api/v1/comms/', include('comms.urls')),
     path('api/v1/reports/', include('reports.urls')),
     path('api/v1/portal/', include('portal.urls')),
+    path('api/v1/auth/', include('accounts.urls')),
     path('ckeditor5/', include('django_ckeditor_5.urls')),
     path('api/schema/', SpectacularAPIView.as_view(), name='schema'),
     path('api/docs/', SpectacularSwaggerView.as_view(url_name='schema'), name='swagger-ui'),

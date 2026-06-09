@@ -32,6 +32,7 @@ INSTALLED_APPS = [
     'rbac',
     'reports',
     'portal',
+    'accounts',
     'django_ckeditor_5',
 ]
 
@@ -111,7 +112,22 @@ REST_FRAMEWORK = {
     'DEFAULT_FILTER_BACKENDS': ['django_filters.rest_framework.DjangoFilterBackend'],
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
     'PAGE_SIZE': 25,
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.SessionAuthentication',
+    ],
 }
+
+# CORS — allow Next dev to send cookies for /manage/
+CORS_ALLOWED_ORIGINS = [
+    'http://localhost:3000',
+    'http://127.0.0.1:3000',
+]
+CSRF_TRUSTED_ORIGINS = [
+    'http://localhost:3000',
+    'http://127.0.0.1:3000',
+]
+SESSION_COOKIE_SAMESITE = 'Lax'
+CSRF_COOKIE_SAMESITE = 'Lax'
 
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 BASE_URL = config('BASE_URL', default='http://localhost:8000')
@@ -165,8 +181,8 @@ SPECTACULAR_SETTINGS = {
     'SERVE_INCLUDE_SCHEMA': False,
 }
 
-# CORS settings
-CORS_ALLOW_ALL_ORIGINS = True
+# CORS settings — credentials require explicit allowlist, not allow_all
+CORS_ALLOW_ALL_ORIGINS = False
 CORS_ALLOW_CREDENTIALS = True
 
 LOGOUT_REDIRECT_URL = '/admin/login/'
