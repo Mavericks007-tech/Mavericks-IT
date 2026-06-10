@@ -3,10 +3,20 @@ from django.utils.html import format_html
 from simple_history.admin import SimpleHistoryAdmin
 
 from .models import (
-    Activity, Client, Contact, Invoice, InvoiceLineItem, Lead,
-    Milestone, Note, Payment, Project, Quote, QuoteLineItem, Task,
+    Activity,
+    Client,
+    Contact,
+    Invoice,
+    InvoiceLineItem,
+    Lead,
+    Milestone,
+    Note,
+    Payment,
+    Project,
+    Quote,
+    QuoteLineItem,
+    Task,
 )
-
 
 # ─── Inlines ──────────────────────────────────────────────────────────────────
 

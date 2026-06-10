@@ -2,9 +2,14 @@ from django.contrib import admin
 from simple_history.admin import SimpleHistoryAdmin
 
 from .models import (
-    SiteSettings, NavMenu, NavItem,
-    FooterColumn, FooterLink,
-    MediaAsset, Page, Redirect,
+    FooterColumn,
+    FooterLink,
+    MediaAsset,
+    NavItem,
+    NavMenu,
+    Page,
+    Redirect,
+    SiteSettings,
 )
 
 

@@ -2,9 +2,13 @@ from django.core.management.base import BaseCommand
 from django.db import transaction
 
 from cms.models import (
-    CTASection, Differentiator, HeroSection, Industry, ProcessStep, Testimonial,
+    CTASection,
+    Differentiator,
+    HeroSection,
+    Industry,
+    ProcessStep,
+    Testimonial,
 )
-
 
 INDUSTRIES = [
     ('Corporate & Enterprise', 'Briefcase', 'Custom ERPs, internal portals, enterprise software for established corporations.'),

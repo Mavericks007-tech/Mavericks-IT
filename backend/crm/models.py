@@ -7,7 +7,6 @@ from simple_history.models import HistoricalRecords
 
 from core.models import BaseModel
 
-
 # ─── Choices ──────────────────────────────────────────────────────────────────
 
 LEAD_SOURCE = [

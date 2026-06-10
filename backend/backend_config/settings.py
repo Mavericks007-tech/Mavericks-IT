@@ -1,6 +1,6 @@
-from pathlib import Path
 import os
 import sys
+from pathlib import Path
 
 from decouple import Csv, config
 
@@ -342,8 +342,8 @@ SENTRY_DSN = config('SENTRY_DSN', default='')
 if SENTRY_DSN and 'test' not in sys.argv:
     try:
         import sentry_sdk
-        from sentry_sdk.integrations.django import DjangoIntegration
         from sentry_sdk.integrations.celery import CeleryIntegration
+        from sentry_sdk.integrations.django import DjangoIntegration
         from sentry_sdk.integrations.logging import LoggingIntegration
 
         sentry_sdk.init(

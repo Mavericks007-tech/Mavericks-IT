@@ -1,28 +1,47 @@
 import csv
 import io
+import re
 
+from django.contrib.auth import get_user_model
 from django.db.models import Count, Sum
 from django.http import HttpResponse
-from rest_framework import status, viewsets
+from rest_framework import viewsets
 from rest_framework.decorators import action
 from rest_framework.parsers import FormParser, MultiPartParser
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 
-import re
-
-from django.contrib.auth import get_user_model
-
 from .models import (
-    Activity, Client, Comment, Contact, Invoice, Lead, Milestone, Note,
-    Payment, Project, ProjectFile, Quote, Task,
+    Activity,
+    Client,
+    Comment,
+    Contact,
+    Invoice,
+    Lead,
+    Milestone,
+    Note,
+    Payment,
+    Project,
+    ProjectFile,
+    Quote,
+    Task,
 )
 from .pdf import render_invoice_pdf, render_quote_pdf
 from .serializers import (
-    ActivitySerializer, ClientSerializer, CommentSerializer, ContactSerializer,
-    InvoiceSerializer, LeadSerializer, MilestoneSerializer, NoteSerializer,
-    PaymentSerializer, ProjectFileSerializer, ProjectSerializer,
-    PublicLeadSerializer, QuoteSerializer, TaskSerializer,
+    ActivitySerializer,
+    ClientSerializer,
+    CommentSerializer,
+    ContactSerializer,
+    InvoiceSerializer,
+    LeadSerializer,
+    MilestoneSerializer,
+    NoteSerializer,
+    PaymentSerializer,
+    ProjectFileSerializer,
+    ProjectSerializer,
+    PublicLeadSerializer,
+    QuoteSerializer,
+    TaskSerializer,
 )
 
 User = get_user_model()
@@ -336,8 +355,8 @@ class CommentViewSet(viewsets.ModelViewSet):
         self._notify(comment, users)
 
     def _notify(self, comment, users):
-        from django.core.mail import send_mail
         from django.conf import settings as dj
+        from django.core.mail import send_mail
         author = getattr(comment.author, 'username', 'someone')
         subject = f'[{author}] mentioned you in a comment'
         for u in users:

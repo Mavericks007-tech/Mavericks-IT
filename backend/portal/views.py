@@ -1,7 +1,7 @@
 """Client-facing portal endpoints. Scoped to the authenticated Contact's Client."""
 from django.http import HttpResponse
 from django.utils import timezone
-from rest_framework import permissions, status, viewsets
+from rest_framework import permissions, viewsets
 from rest_framework.decorators import action, api_view, authentication_classes, permission_classes
 from rest_framework.parsers import FormParser, MultiPartParser
 from rest_framework.permissions import AllowAny
@@ -10,8 +10,12 @@ from rest_framework.response import Response
 from crm.models import Invoice, Milestone, Payment, Project, ProjectFile, Quote
 from crm.pdf import render_invoice_pdf, render_quote_pdf
 from crm.serializers import (
-    InvoiceSerializer, MilestoneSerializer, PaymentSerializer,
-    ProjectFileSerializer, ProjectSerializer, QuoteSerializer,
+    InvoiceSerializer,
+    MilestoneSerializer,
+    PaymentSerializer,
+    ProjectFileSerializer,
+    ProjectSerializer,
+    QuoteSerializer,
 )
 
 from .auth import PortalContact, PortalTokenAuthentication

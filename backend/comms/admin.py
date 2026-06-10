@@ -1,5 +1,4 @@
 from django.contrib import admin, messages
-from django.shortcuts import redirect
 from simple_history.admin import SimpleHistoryAdmin
 
 from .models import EmailCampaign, EmailLog, EmailSettings, EmailTemplate

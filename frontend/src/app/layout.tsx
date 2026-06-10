@@ -113,6 +113,12 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         />
       </head>
       <body className="bg-deep-space text-white font-body antialiased">
+        <a
+          href="#main"
+          className="sr-only focus:not-sr-only focus:fixed focus:top-3 focus:left-3 focus:z-[9999] focus:px-4 focus:py-2 focus:bg-electric-cyan focus:text-deep-space focus:rounded-md focus:font-semibold"
+        >
+          Skip to main content
+        </a>
         <GtmNoscript gtm={a?.google_tag_manager_id || undefined} />
         <ToastProvider>
           <ToastBridge />

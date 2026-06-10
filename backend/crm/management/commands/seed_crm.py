@@ -6,8 +6,16 @@ from django.db import transaction
 from django.utils import timezone
 
 from crm.models import (
-    Client, Contact, Invoice, InvoiceLineItem, Lead,
-    Milestone, Payment, Project, Quote, QuoteLineItem,
+    Client,
+    Contact,
+    Invoice,
+    InvoiceLineItem,
+    Lead,
+    Milestone,
+    Payment,
+    Project,
+    Quote,
+    QuoteLineItem,
 )
 
 

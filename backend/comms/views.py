@@ -1,7 +1,6 @@
 import base64
 
 from django.http import HttpResponse
-from django.shortcuts import get_object_or_404
 from rest_framework import status, viewsets
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated
@@ -9,8 +8,10 @@ from rest_framework.response import Response
 
 from .models import EmailCampaign, EmailLog, EmailTemplate
 from .serializers import (
-    EmailCampaignSerializer, EmailLogSerializer,
-    EmailSendSerializer, EmailTemplateSerializer,
+    EmailCampaignSerializer,
+    EmailLogSerializer,
+    EmailSendSerializer,
+    EmailTemplateSerializer,
 )
 from .services import send_email
 

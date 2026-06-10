@@ -10,7 +10,6 @@ from cms.models import BlogPost, CaseStudy, Industry, Service
 from seo.models import MetaTag, SchemaOrg
 from site_content.models import Page
 
-
 # ---------------------------------------------------------------------------
 # Page bodies
 # ---------------------------------------------------------------------------

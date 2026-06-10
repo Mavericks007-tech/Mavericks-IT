@@ -2,7 +2,6 @@
 from __future__ import annotations
 
 import logging
-from typing import Optional
 
 from django.conf import settings as dj_settings
 from django.core.mail import EmailMultiAlternatives, get_connection
@@ -16,7 +15,7 @@ logger = logging.getLogger(__name__)
 TRACKING_PIXEL_HTML = '<img src="{url}" width="1" height="1" alt="" style="display:none;" />'
 
 
-def _get_settings() -> Optional[EmailSettings]:
+def _get_settings() -> EmailSettings | None:
     return EmailSettings.objects.first()
 
 
@@ -44,18 +43,18 @@ def _inject_tracking(log: EmailLog, html: str) -> str:
 
 def send_email(
     *,
-    template_key: Optional[str] = None,
-    template: Optional[EmailTemplate] = None,
+    template_key: str | None = None,
+    template: EmailTemplate | None = None,
     to_email: str,
     to_name: str = '',
-    context: Optional[dict] = None,
-    cc: Optional[list[str]] = None,
-    bcc: Optional[list[str]] = None,
-    related: Optional[dict] = None,
+    context: dict | None = None,
+    cc: list[str] | None = None,
+    bcc: list[str] | None = None,
+    related: dict | None = None,
     sent_by=None,
-    raw_subject: Optional[str] = None,
-    raw_html: Optional[str] = None,
-    raw_text: Optional[str] = None,
+    raw_subject: str | None = None,
+    raw_html: str | None = None,
+    raw_text: str | None = None,
 ) -> EmailLog:
     """Send email via template or raw content. Returns EmailLog (sent or failed)."""
     es = _get_settings()

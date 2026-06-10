@@ -1,10 +1,8 @@
 """Audit log endpoint — aggregates django-simple-history records across models."""
 from django.apps import apps
 from rest_framework.decorators import api_view, permission_classes
-from rest_framework.pagination import PageNumberPagination
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
-
 
 HISTORY_TYPE_LABELS = {'+': 'create', '~': 'update', '-': 'delete'}
 

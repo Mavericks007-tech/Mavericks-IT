@@ -3,8 +3,16 @@ from django.contrib.auth.admin import UserAdmin
 from django.contrib.auth.models import User
 
 from .models import (
-    HeroSection, TrustStat, Service, Industry, CaseStudy,
-    Differentiator, ProcessStep, Testimonial, BlogPost, CTASection,
+    BlogPost,
+    CaseStudy,
+    CTASection,
+    Differentiator,
+    HeroSection,
+    Industry,
+    ProcessStep,
+    Service,
+    Testimonial,
+    TrustStat,
 )
 
 

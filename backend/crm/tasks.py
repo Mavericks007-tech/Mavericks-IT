@@ -11,8 +11,9 @@ log = logging.getLogger(__name__)
 @shared_task(name='crm.tasks.send_payment_reminders')
 def send_payment_reminders():
     """Email primary client contact for every overdue invoice."""
-    from django.core.mail import send_mail
     from django.conf import settings
+    from django.core.mail import send_mail
+
     from .models import Invoice
 
     today = timezone.now().date()
@@ -50,8 +51,9 @@ def send_payment_reminders():
 @shared_task(name='crm.tasks.followup_abandoned_quotes')
 def followup_abandoned_quotes():
     """Quotes sent but not accepted within 7 days → nudge email."""
-    from django.core.mail import send_mail
     from django.conf import settings
+    from django.core.mail import send_mail
+
     from .models import Quote
 
     cutoff = timezone.now() - timedelta(days=7)

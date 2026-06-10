@@ -1,10 +1,22 @@
 from rest_framework import serializers
 
 from .models import (
-    Activity, Client, Comment, Contact, Invoice, InvoiceLineItem, Lead,
-    Milestone, Note, Payment, Project, ProjectFile, Quote, QuoteLineItem, Task,
+    Activity,
+    Client,
+    Comment,
+    Contact,
+    Invoice,
+    InvoiceLineItem,
+    Lead,
+    Milestone,
+    Note,
+    Payment,
+    Project,
+    ProjectFile,
+    Quote,
+    QuoteLineItem,
+    Task,
 )
-
 
 # ─── Client / Contact ─────────────────────────────────────────────────────────
 

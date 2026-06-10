@@ -2,7 +2,7 @@
 from datetime import timedelta
 from decimal import Decimal
 
-from django.db.models import Avg, Count, F, Q, Sum
+from django.db.models import Count, F, Q, Sum
 from django.db.models.functions import TruncMonth
 from django.utils import timezone
 from rest_framework.decorators import api_view, permission_classes
@@ -10,7 +10,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
 from comms.models import EmailCampaign, EmailLog
-from crm.models import Client, Invoice, Lead, Project, Quote, Task
+from crm.models import Client, Invoice, Lead, Project, Task
 
 
 def _decimal(v):

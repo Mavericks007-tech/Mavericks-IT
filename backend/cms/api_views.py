@@ -1,8 +1,15 @@
 from django.http import JsonResponse
 
 from .models import (
-    CaseStudy, CTASection, Differentiator, HeroSection, Industry,
-    ProcessStep, Service, Testimonial, TrustStat,
+    CaseStudy,
+    CTASection,
+    Differentiator,
+    HeroSection,
+    Industry,
+    ProcessStep,
+    Service,
+    Testimonial,
+    TrustStat,
 )
 
 
@@ -151,7 +158,7 @@ def homepage_data(request):
 
 def site_settings(request):
     """SiteSettings + active nav menus + footer columns + links."""
-    from site_content.models import NavMenu, FooterColumn, SiteSettings
+    from site_content.models import FooterColumn, NavMenu, SiteSettings
 
     settings_obj = SiteSettings.objects.first()
     header_menu = NavMenu.objects.filter(location='header', is_active=True).prefetch_related('items').first()

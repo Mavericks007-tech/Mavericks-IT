@@ -1,7 +1,9 @@
-from django.db import models
 from django.core.exceptions import ValidationError
+from django.db import models
 from django.utils import timezone
+
 from apps.core.models import BaseModel
+
 
 class HeroSection(BaseModel):
     """Hero section content - singleton"""
@@ -19,10 +21,10 @@ class HeroSection(BaseModel):
     gradient_end = models.CharField(max_length=20, default="#00D9FF")
     particle_count = models.IntegerField(default=50)
     is_active = models.BooleanField(default=True)
-    
+
     class Meta:
         db_table = 'cms_hero_section'
-    
+
     def save(self, *args, **kwargs):
         if not self.pk and HeroSection.objects.exists():
             raise ValidationError("Only one HeroSection can exist")
@@ -36,7 +38,7 @@ class TrustStat(BaseModel):
     suffix = models.CharField(max_length=20, blank=True)
     order = models.IntegerField(default=0)
     is_active = models.BooleanField(default=True)
-    
+
     class Meta:
         db_table = 'cms_trust_stats'
         ordering = ['order']
@@ -52,7 +54,7 @@ class Service(BaseModel):
     order = models.IntegerField(default=0)
     is_featured = models.BooleanField(default=True)
     cta_link = models.CharField(max_length=200, blank=True)
-    
+
     class Meta:
         db_table = 'cms_services'
         ordering = ['order']
@@ -65,7 +67,7 @@ class Industry(BaseModel):
     example_service = models.CharField(max_length=200, blank=True)
     order = models.IntegerField(default=0)
     is_active = models.BooleanField(default=True)
-    
+
     class Meta:
         db_table = 'cms_industries'
         ordering = ['order']
@@ -89,7 +91,7 @@ class CaseStudy(BaseModel):
     technologies = models.JSONField(default=list)
     is_featured = models.BooleanField(default=False)
     order = models.IntegerField(default=0)
-    
+
     class Meta:
         db_table = 'cms_case_studies'
         ordering = ['order']
@@ -100,7 +102,7 @@ class Differentiator(BaseModel):
     description = models.TextField()
     icon_name = models.CharField(max_length=50)
     order = models.IntegerField(default=0)
-    
+
     class Meta:
         db_table = 'cms_differentiators'
         ordering = ['order']
@@ -113,7 +115,7 @@ class ProcessStep(BaseModel):
     duration = models.CharField(max_length=50)
     icon_name = models.CharField(max_length=50)
     order = models.IntegerField(default=0)
-    
+
     class Meta:
         db_table = 'cms_process_steps'
         ordering = ['step_number']
@@ -130,7 +132,7 @@ class Testimonial(BaseModel):
     service_used = models.CharField(max_length=200)
     is_featured = models.BooleanField(default=False)
     order = models.IntegerField(default=0)
-    
+
     class Meta:
         db_table = 'cms_testimonials'
         ordering = ['order']
@@ -150,7 +152,7 @@ class BlogPost(BaseModel):
     views = models.IntegerField(default=0)
     is_published = models.BooleanField(default=False)
     published_at = models.DateTimeField(default=timezone.now)
-    
+
     class Meta:
         db_table = 'cms_blog_posts'
         ordering = ['-published_at']
@@ -166,10 +168,10 @@ class CTASection(BaseModel):
     background_gradient_start = models.CharField(max_length=20, default="#0066FF")
     background_gradient_end = models.CharField(max_length=20, default="#00D9FF")
     is_active = models.BooleanField(default=True)
-    
+
     class Meta:
         db_table = 'cms_cta_section'
-    
+
     def save(self, *args, **kwargs):
         if not self.pk and CTASection.objects.exists():
             raise ValidationError("Only one CTASection can exist")

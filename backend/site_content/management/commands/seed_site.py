@@ -3,9 +3,13 @@ from django.db import transaction
 
 from seo.models import MetaTag, SchemaOrg
 from site_content.models import (
-    FooterColumn, FooterLink, NavItem, NavMenu, Page, SiteSettings,
+    FooterColumn,
+    FooterLink,
+    NavItem,
+    NavMenu,
+    Page,
+    SiteSettings,
 )
-
 
 HEADER_NAV = [
     ('Services', '/services'),

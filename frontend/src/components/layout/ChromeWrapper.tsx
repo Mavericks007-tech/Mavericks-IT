@@ -21,7 +21,7 @@ export function ChromeWrapper({ navbar, footer, children }: {
   return (
     <>
       {navbar}
-      <main>{children}</main>
+      <main id="main">{children}</main>
       {footer}
     </>
   );

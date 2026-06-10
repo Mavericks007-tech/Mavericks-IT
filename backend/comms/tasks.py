@@ -14,9 +14,10 @@ def send_weekly_client_digest():
 
     Sent every Monday 8 AM via Celery Beat (config in backend_config/celery.py).
     """
-    from crm.models import Client, Invoice, Milestone, Project
-    from django.core.mail import send_mail
     from django.conf import settings
+    from django.core.mail import send_mail
+
+    from crm.models import Client, Invoice, Milestone, Project
 
     sent = 0
     week_ago = timezone.now() - timedelta(days=7)

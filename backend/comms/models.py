@@ -6,7 +6,6 @@ from simple_history.models import HistoricalRecords
 
 from core.models import BaseModel
 
-
 TEMPLATE_CATEGORY = [
     ('lead', 'Lead'),
     ('quote', 'Quote'),

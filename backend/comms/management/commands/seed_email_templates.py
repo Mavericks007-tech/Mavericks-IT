@@ -3,7 +3,6 @@ from django.db import transaction
 
 from comms.models import EmailSettings, EmailTemplate
 
-
 TEMPLATES = [
     {
         'key': 'welcome_lead',
