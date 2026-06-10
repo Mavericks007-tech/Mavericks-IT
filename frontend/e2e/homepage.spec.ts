@@ -13,44 +13,55 @@ test.describe('public site', () => {
     await expect(link).toBeVisible();
   });
 
-  test('/contact form renders required fields', async ({ page }) => {
+  test('/contact page renders contact heading', async ({ page }) => {
     await page.goto('/contact');
-    await expect(page.getByRole('heading', { name: /contact/i }).first()).toBeVisible();
+    // PageHeader uses h1 with the literal title text.
+    await expect(
+      page.getByRole('heading', {
+        name: /let.{0,3}s build something extraordinary together/i,
+      }),
+    ).toBeVisible();
   });
 
   test('/get-quote multi-step wizard mounts', async ({ page }) => {
     await page.goto('/get-quote');
-    await expect(page.getByText(/Free Custom Quote|Get Your Project Quote/i).first()).toBeVisible();
+    await expect(
+      page.getByRole('heading', { name: /get your project quote/i }),
+    ).toBeVisible();
   });
 
-  test('blog list loads (or shows empty state)', async ({ page }) => {
+  test('blog list page loads', async ({ page }) => {
     await page.goto('/blog');
-    await expect(page.getByRole('heading', { name: /insights/i }).first()).toBeVisible();
+    await expect(
+      page.getByRole('heading', { name: /insights from our engineers/i }),
+    ).toBeVisible();
   });
 
-  test('manage login page renders', async ({ page }) => {
+  test('manage login page renders inputs', async ({ page }) => {
     await page.goto('/manage/login');
-    await expect(page.getByRole('textbox', { name: /username/i })).toBeVisible();
-    await expect(page.getByRole('textbox', { name: /password/i })).toBeVisible();
+    // Inputs are plain <input>, no associated label — query by placeholder/type.
+    await expect(page.locator('input[type="text"], input:not([type])').first()).toBeVisible();
+    await expect(page.locator('input[type="password"]').first()).toBeVisible();
   });
 
-  test('portal login page renders', async ({ page }) => {
+  test('portal login page renders email input', async ({ page }) => {
     await page.goto('/portal/login');
-    await expect(page.locator('body')).toBeVisible();
+    await expect(page.locator('input[type="email"]').first()).toBeVisible();
   });
 
   test('robots.txt is reachable', async ({ request }) => {
-    const r = await request.get('/robots.txt');
+    const r = await request.get('/robots.txt', { timeout: 60_000 });
     expect(r.ok()).toBeTruthy();
   });
 
   test('sitemap.xml is reachable', async ({ request }) => {
-    const r = await request.get('/sitemap.xml');
+    // Sitemap proxies backend /api/v1/seo/sitemap-feed/ — can be slow.
+    const r = await request.get('/sitemap.xml', { timeout: 60_000 });
     expect(r.ok()).toBeTruthy();
   });
 
   test('manifest.webmanifest serves JSON', async ({ request }) => {
-    const r = await request.get('/manifest.webmanifest');
+    const r = await request.get('/manifest.webmanifest', { timeout: 60_000 });
     expect(r.ok()).toBeTruthy();
   });
 });

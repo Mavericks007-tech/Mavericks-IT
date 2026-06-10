@@ -72,6 +72,7 @@ export function BlogList({ posts }: { posts: Post[] }) {
         <select
           value={cat}
           onChange={(e) => { setCat(e.target.value); setPage(1); }}
+          aria-label="Filter by category"
           className="bg-white/5 border border-white/10 rounded-lg px-3 py-2.5 text-white text-sm focus:outline-none focus:border-electric-cyan"
         >
           <option value="">All categories</option>
