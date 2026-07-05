@@ -16,6 +16,14 @@ interface MediaRow {
   width?: number | null;
   height?: number | null;
   created_at: string;
+  provider?: 'local' | 's3' | 'cloudinary';
+  public_id?: string;
+  cdn_url?: string;
+}
+
+function cloudinaryVariant(cdn: string, width: number): string {
+  if (!/res\.cloudinary\.com/.test(cdn)) return cdn;
+  return cdn.replace(/\/upload\/[^/]*\//, `/upload/q_auto,f_auto,w_${width},c_fill/`);
 }
 
 function fmtSize(b?: number): string {
@@ -100,7 +108,11 @@ export default function MediaLibrary() {
 
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-4">
           {rows.map((row) => {
-            const url = row.file_url ?? row.file;
+            const url = row.cdn_url || row.file_url || row.file;
+            const provider = row.provider ?? 'local';
+            const providerColor = provider === 'cloudinary' ? 'bg-cyan/20 text-cyan border-cyan/40'
+              : provider === 's3' ? 'bg-orange-500/20 text-orange-300 border-orange-500/40'
+              : 'bg-white/10 text-soft-gray border-white/20';
             return (
               <div key={row.id} className="glass rounded-xl overflow-hidden group">
                 <button
@@ -115,6 +127,9 @@ export default function MediaLibrary() {
                     // eslint-disable-next-line @next/next/no-img-element
                     <img src={url} alt={row.caption} className="w-full h-full object-cover group-hover:scale-105 transition-transform" />
                   )}
+                  <span className={`absolute top-2 left-2 text-[10px] uppercase tracking-widest border rounded px-1.5 py-0.5 ${providerColor}`}>
+                    {provider}
+                  </span>
                   <span className="absolute inset-x-0 bottom-0 bg-black/60 text-white text-xs px-2 py-1 opacity-0 group-hover:opacity-100 transition-opacity">
                     Copy URL
                   </span>
@@ -125,6 +140,21 @@ export default function MediaLibrary() {
                     <span>{fmtSize(row.file_size)}</span>
                     <button onClick={() => handleDelete(row)} className="text-crimson hover:underline">Delete</button>
                   </div>
+                  {provider === 'cloudinary' && row.cdn_url && (
+                    <div className="flex gap-1 pt-1 border-t border-white/10 mt-1">
+                      {[200, 800, 1600].map((w) => (
+                        <button
+                          key={w}
+                          type="button"
+                          onClick={() => copyURL(cloudinaryVariant(row.cdn_url!, w))}
+                          className="text-[10px] px-1.5 py-0.5 rounded bg-white/5 text-soft-gray hover:bg-cyan/15 hover:text-cyan"
+                          title={`Copy ${w}w variant URL`}
+                        >
+                          {w}w
+                        </button>
+                      ))}
+                    </div>
+                  )}
                 </div>
               </div>
             );

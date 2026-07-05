@@ -43,6 +43,10 @@ INSTALLED_APPS = [
     'django_celery_results',
 ]
 
+USE_CLOUDINARY = config('USE_CLOUDINARY', default=False, cast=bool)
+if USE_CLOUDINARY:
+    INSTALLED_APPS += ['cloudinary', 'cloudinary_storage']
+
 MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
@@ -122,16 +126,37 @@ if USE_S3:
     AWS_ACCESS_KEY_ID = config('AWS_ACCESS_KEY_ID')
     AWS_SECRET_ACCESS_KEY = config('AWS_SECRET_ACCESS_KEY')
     AWS_STORAGE_BUCKET_NAME = config('AWS_STORAGE_BUCKET_NAME')
-    AWS_S3_REGION_NAME = config('AWS_S3_REGION_NAME', default='ap-southeast-1')
-    AWS_S3_CUSTOM_DOMAIN = config('AWS_S3_CUSTOM_DOMAIN', default=f'{AWS_STORAGE_BUCKET_NAME}.s3.amazonaws.com')
+    AWS_S3_REGION_NAME = config('AWS_S3_REGION_NAME', default='sgp1')
+    # Works with real AWS S3 (leave endpoint blank) OR DigitalOcean Spaces
+    # (endpoint like https://sgp1.digitaloceanspaces.com).
+    AWS_S3_ENDPOINT_URL = config(
+        'AWS_S3_ENDPOINT_URL',
+        default=f'https://{AWS_S3_REGION_NAME}.digitaloceanspaces.com',
+    )
+    AWS_S3_CUSTOM_DOMAIN = config(
+        'AWS_S3_CUSTOM_DOMAIN',
+        default=f'{AWS_STORAGE_BUCKET_NAME}.{AWS_S3_REGION_NAME}.cdn.digitaloceanspaces.com',
+    )
     AWS_S3_OBJECT_PARAMETERS = {'CacheControl': 'max-age=86400'}
-    AWS_DEFAULT_ACL = None
+    AWS_DEFAULT_ACL = 'public-read'
     AWS_QUERYSTRING_AUTH = False
+    AWS_S3_FILE_OVERWRITE = False
     DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
     MEDIA_URL = f'https://{AWS_S3_CUSTOM_DOMAIN}/media/'
 else:
     MEDIA_URL = '/media/'
     MEDIA_ROOT = BASE_DIR / 'media'
+
+# Cloudinary wins over S3/local for media if enabled.
+if USE_CLOUDINARY:
+    CLOUDINARY_STORAGE = {
+        'CLOUD_NAME': config('CLOUDINARY_CLOUD_NAME'),
+        'API_KEY':    config('CLOUDINARY_API_KEY'),
+        'API_SECRET': config('CLOUDINARY_API_SECRET'),
+        'SECURE':     True,
+    }
+    CLOUDINARY_FOLDER = config('CLOUDINARY_FOLDER', default='mavericks')
+    DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 

@@ -24,6 +24,10 @@ django-celery-results>=2.5
 django-storages>=1.14
 boto3>=1.34
 
+# --- storage / cloudinary ---
+cloudinary>=1.40
+django-cloudinary-storage>=0.3
+
 # --- observability ---
 sentry-sdk>=2.0
 python-json-logger>=2.0

@@ -136,6 +136,12 @@ class MediaAsset(BaseModel):
         ('other', 'Other'),
     ]
 
+    PROVIDER_CHOICES = [
+        ('local', 'Local filesystem'),
+        ('s3', 'AWS S3'),
+        ('cloudinary', 'Cloudinary'),
+    ]
+
     title = models.CharField(max_length=200)
     file = models.FileField(
         upload_to='media/%Y/%m/',
@@ -147,6 +153,20 @@ class MediaAsset(BaseModel):
                                 help_text="Required for images (SEO + accessibility)")
     caption = models.CharField(max_length=300, blank=True)
     tags = models.JSONField(default=list, blank=True)
+
+    # Storage provider
+    provider = models.CharField(
+        max_length=20, choices=PROVIDER_CHOICES, default='local',
+        help_text="Which storage backend holds the bytes.",
+    )
+    public_id = models.CharField(
+        max_length=300, blank=True,
+        help_text="Cloudinary public_id (used for transformations + delete). Blank for local/S3.",
+    )
+    cdn_url = models.URLField(
+        max_length=600, blank=True,
+        help_text="Cached CDN URL. Populated on upload; recomputed on file change.",
+    )
 
     # Auto-populated metadata
     file_size = models.BigIntegerField(default=0, help_text="Bytes")
@@ -185,6 +205,72 @@ class MediaAsset(BaseModel):
             if guessed:
                 self.mime_type = guessed
         super().save(*args, **kwargs)
+        # After save: derive provider + cdn_url + public_id from active storage.
+        self._sync_storage_metadata()
+
+    def _sync_storage_metadata(self):
+        """Populate provider, cdn_url, public_id from the storage backend that actually holds the file."""
+        if not self.file:
+            return
+        from django.conf import settings
+        backend = settings.DEFAULT_FILE_STORAGE if hasattr(settings, 'DEFAULT_FILE_STORAGE') else ''
+        changed = False
+
+        if 'cloudinary' in backend.lower() or getattr(settings, 'USE_CLOUDINARY', False):
+            new_provider = 'cloudinary'
+            try:
+                new_url = self.file.url
+            except Exception:
+                new_url = ''
+            # Cloudinary public_id = file name minus extension, keep folder path.
+            raw = self.file.name or ''
+            new_public_id = raw.rsplit('.', 1)[0] if '.' in raw.rsplit('/', 1)[-1] else raw
+        elif getattr(settings, 'USE_S3', False):
+            new_provider = 's3'
+            try:
+                new_url = self.file.url
+            except Exception:
+                new_url = ''
+            new_public_id = ''
+        else:
+            new_provider = 'local'
+            try:
+                new_url = self.file.url
+            except Exception:
+                new_url = ''
+            new_public_id = ''
+
+        if self.provider != new_provider:
+            self.provider = new_provider
+            changed = True
+        if self.cdn_url != new_url:
+            self.cdn_url = new_url
+            changed = True
+        if self.public_id != new_public_id:
+            self.public_id = new_public_id
+            changed = True
+        if changed:
+            type(self).objects.filter(pk=self.pk).update(
+                provider=self.provider, cdn_url=self.cdn_url, public_id=self.public_id,
+            )
+
+    def transformed_url(self, width=None, height=None, quality='auto', fmt='auto', crop='fill'):
+        """Return CDN URL with Cloudinary transformations. For non-Cloudinary providers, returns cdn_url unchanged."""
+        if self.provider != 'cloudinary' or not self.public_id:
+            return self.cdn_url or (self.file.url if self.file else '')
+        from django.conf import settings
+        cloud = settings.CLOUDINARY_STORAGE.get('CLOUD_NAME', '') if hasattr(settings, 'CLOUDINARY_STORAGE') else ''
+        if not cloud:
+            return self.cdn_url
+        parts = [f'q_{quality}', f'f_{fmt}']
+        if width:
+            parts.append(f'w_{width}')
+        if height:
+            parts.append(f'h_{height}')
+        if width or height:
+            parts.append(f'c_{crop}')
+        resource = 'video' if self.media_type == 'video' else 'image'
+        return f'https://res.cloudinary.com/{cloud}/{resource}/upload/{",".join(parts)}/{self.public_id}'
 
     @property
     def size_display(self):
