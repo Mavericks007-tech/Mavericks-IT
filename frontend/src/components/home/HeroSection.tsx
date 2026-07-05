@@ -21,14 +21,19 @@ interface Props {
   trustStats?: TrustStat[];
 }
 
+// Sensible defaults so the hero renders even before an admin fills in HeroSection.
+const DEFAULT_HERO: HeroData = {
+  id: 'default',
+  headline: 'Bangladesh\'s Most Trusted Technology Partner',
+  subheadline: 'Custom software, web, mobile, e-commerce and cybersecurity — engineered by senior teams at fixed prices with real timelines.',
+  primary_cta_text: 'Get Free Consultation',
+  primary_cta_link: '/contact',
+  secondary_cta_text: 'View Our Work',
+  secondary_cta_link: '/portfolio',
+};
+
 export function HeroSection({ hero, trustStats = [] }: Props) {
-  if (!hero) {
-    return (
-      <section className="relative min-h-screen flex items-center justify-center">
-        <p className="text-soft-gray">Loading...</p>
-      </section>
-    );
-  }
+  const data = hero ?? DEFAULT_HERO;
 
   return (
     <section className="relative min-h-screen flex items-center overflow-hidden pt-20">
@@ -52,7 +57,7 @@ export function HeroSection({ hero, trustStats = [] }: Props) {
           </motion.span>
 
           <h1 className="font-display text-h1 text-white mb-6 text-balance">
-            {hero.headline.split(' ').map((word, i) => (
+            {data.headline.split(' ').map((word, i) => (
               <motion.span
                 key={i}
                 initial={{ opacity: 0, y: 20 }}
@@ -75,7 +80,7 @@ export function HeroSection({ hero, trustStats = [] }: Props) {
             transition={{ delay: 0.6 }}
             className="text-body-lg text-soft-gray max-w-2xl mx-auto mb-10"
           >
-            {hero.subheadline}
+            {data.subheadline}
           </motion.p>
 
           <motion.div
@@ -84,11 +89,11 @@ export function HeroSection({ hero, trustStats = [] }: Props) {
             transition={{ delay: 0.8 }}
             className="flex flex-col sm:flex-row gap-4 justify-center"
           >
-            <Button href={hero.primary_cta_link} size="lg">
-              {hero.primary_cta_text} <ArrowRight size={18} />
+            <Button href={data.primary_cta_link} size="lg">
+              {data.primary_cta_text} <ArrowRight size={18} />
             </Button>
-            <Button href={hero.secondary_cta_link} size="lg" variant="secondary">
-              {hero.secondary_cta_text}
+            <Button href={data.secondary_cta_link} size="lg" variant="secondary">
+              {data.secondary_cta_text}
             </Button>
           </motion.div>
         </motion.div>
