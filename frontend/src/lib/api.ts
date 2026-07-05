@@ -1,7 +1,17 @@
 /**
  * Typed API client for Mavericks Tech backend.
+ *
+ * Two URLs:
+ *  - browser (client-side JS in visitor's browser) → NEXT_PUBLIC_API_URL, must be publicly reachable
+ *  - server (Next.js SSR/RSC inside Docker) → API_INTERNAL_URL, points at backend container
+ *
+ * When both are unset we fall back to localhost dev.
+ * The internal URL avoids hairpin NAT: SSR trying to fetch the droplet's own
+ * public IP from inside a Docker container often hangs on cloud VPS.
  */
-export const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api/v1';
+export const API_BASE_BROWSER = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api/v1';
+export const API_BASE_SERVER = process.env.API_INTERNAL_URL || process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api/v1';
+export const API_BASE = typeof window === 'undefined' ? API_BASE_SERVER : API_BASE_BROWSER;
 
 export interface Service {
   id: string;

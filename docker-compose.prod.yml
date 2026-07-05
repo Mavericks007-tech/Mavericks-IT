@@ -92,13 +92,19 @@ services:
     command: celery -A backend_config beat -l info
 
   frontend:
-    build: ./frontend
+    build:
+      context: ./frontend
+      args:
+        NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL}
+        NEXT_PUBLIC_SITE_URL: ${NEXT_PUBLIC_SITE_URL}
     restart: unless-stopped
     environment:
       TZ: Asia/Dhaka
       NODE_ENV: production
       NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL}
       NEXT_PUBLIC_SITE_URL: ${NEXT_PUBLIC_SITE_URL}
+      # Server-side (SSR/RSC) fetch target — avoids hairpin NAT loop
+      API_INTERNAL_URL: http://backend:8000/api/v1
     depends_on: [backend]
 
   nginx:
